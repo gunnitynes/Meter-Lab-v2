@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Meter Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,12 +77,13 @@ p{margin:0}
 .utitle{flex:1 1 0;display:flex;align-items:center;gap:12px;min-width:0;align-self:stretch;margin:-6px 0}
 .utitle b{align-self:stretch;display:grid;place-items:center;background:var(--red);color:#fff;font:900 26px/1 var(--disp);font-stretch:62%;width:56px;flex:none;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .utitle h1{font:900 15px/1.1 var(--disp);font-stretch:112%;text-transform:uppercase;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
-.utitle span{flex:1 1 0;font:400 12px/1.3 var(--disp);text-transform:none;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.utitle h1 span{display:inline;flex:none;font:inherit;color:inherit;white-space:inherit;overflow:visible}
+.utitle > span{flex:1 1 0;font:400 12px/1.3 var(--disp);text-transform:none;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .uq[hidden]{display:inline-block!important;visibility:hidden}
 .uq{flex:none;font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:4px 8px}
 .uq:hover{background:var(--red);border-color:var(--red);color:#fff}
-@media (max-width:1180px){.utitle span{display:none}}
-@media (max-width:760px){.util{flex-wrap:wrap;height:auto}.utitle{flex-basis:100%}.utitle span{display:none}.utitle h1{white-space:normal;font-size:13px;flex:1 1 0}}
+@media (max-width:1180px){.utitle > span{display:none}}
+@media (max-width:760px){.util{flex-wrap:wrap;height:auto}.utitle{flex-basis:100%}.utitle > span{display:none}.utitle h1{white-space:normal;font-size:13px;flex:1 1 0}}
 .ub{font:inherit;background:none;border:0;padding:2px 0;border-bottom:2px solid transparent;text-transform:uppercase}
 .ub:hover{border-bottom-color:var(--red)}
 .ub[aria-pressed="true"]{color:var(--red);border-bottom-color:var(--red)}
@@ -385,6 +386,54 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
   .opts{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- phone layout: slim top, thumb-reach transport at the bottom ---------- */
+#moreB,.sheet{display:none}
+@media (max-width:760px){
+  body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+  .top{grid-template-columns:auto minmax(0,1fr);border-bottom-width:2px}
+  .logo{padding:0 10px;border-right-width:2px}
+  .logo svg{width:30px;height:30px}
+  .logo span{display:none}
+  .nav{grid-column:2;grid-row:1;border-top:0}
+  .ni{min-width:0;padding:9px 0;justify-items:center;border-right-width:1.5px}
+  .ni:last-child{border-right:0}
+  .ni b{font-size:22px}
+  .util{height:auto;padding:0 10px 0 0;flex-wrap:nowrap;gap:10px;border-bottom-width:2px}
+  .util .grp{display:none}
+  .utitle{flex:1 1 auto;margin:0;gap:10px;align-self:stretch}
+  .utitle b{width:46px;font-size:22px}
+  .utitle h1{flex:1 1 0;font-size:12.5px;line-height:1.15;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding:7px 0}
+  .uq{padding:6px 8px;font-size:10px}
+  .utitle h1 .tt2{display:none}
+  .trans{position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--paper);border:0;border-top:3px solid var(--ink);display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  .play{width:50px;height:50px;order:-2}
+  .cinv{position:absolute;left:66px;top:-46px;font-size:34px;background:var(--paper);padding:0 6px}
+  .cinv:empty{display:none}
+  .bpm{grid-template-columns:30px auto 30px}
+  .bpm output{font-size:34px;min-width:1.9ch}
+  .bpm button{width:30px;height:30px}
+  .bpm span{display:none}
+  .tb{padding:10px 9px;font-size:10.5px}
+  #cinB{display:none}
+  #moreB{display:inline-block;letter-spacing:.06em}
+  .sheet{position:fixed;right:10px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:75;flex-direction:column;background:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:8px;gap:0}
+  .sheet:not([hidden]){display:flex}
+  .sheet .sb{margin:0 0 -2px;padding:12px 16px;font-size:12px;text-align:left}
+  .toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+  main{padding:10px 10px 30px}
+  .keys{display:none}
+  .work .stage{height:clamp(330px,calc(100svh - 190px),560px)}
+  .work .stage canvas{height:calc(100% - 58px)}
+  .tapo{top:auto;bottom:0;left:0;right:0;border:0;border-top:2px solid var(--ink);padding:7px 8px;height:58px;justify-content:space-between;gap:8px}
+  .tapo > span{display:none}
+  .tapbtn{flex:1 1 auto;justify-content:center;align-self:stretch;font-size:14px;padding:0 12px}
+  .tapbtn kbd{display:none}
+  .tapo .seg{flex:none}
+  .tapo .seg .sb{padding:9px 8px;font-size:9.5px}
+  .pop{top:12px;font-size:26px}
+  .arena .stage{height:300px!important}
+}
 </style>
 </head>
 <body>
@@ -408,6 +457,7 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
     <button class="tb" id="tapTempo" type="button" title="Tap tempo (T)">Tap</button>
     <button class="tb" id="metroB" type="button" aria-pressed="false" title="Click track (M)">Click</button>
     <button class="tb" id="cinB" type="button" aria-pressed="false" title="One bar of clicks before the loop starts">Count-in</button>
+    <button class="tb" id="moreB" type="button" aria-expanded="false" aria-controls="sheet" aria-label="More options">•••</button>
   </div>
 </header>
 <div class="util">
@@ -417,6 +467,7 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 </div>
 
 <main id="main"></main>
+<div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="midi">Export MIDI ↓</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -611,7 +662,7 @@ function sBounce(x,W,H,I,P){
     tx(x,r.name.toUpperCase(),x0,top+28,{f:'700 12px "Space Mono"'});
     if(I.tap===r.L)tag(x,`YOU TAP · ${r.beats} BEATS`,x1,top+28,'right');
     if(r.info)tx(x,r.info,x0,top+46,{f:'400 11px "Space Mono"',c:PAL.ink2});
-    const B=r.beats,dv=r.div,n=B*dv,hA=Math.max(30,Math.min(band*0.5,band-118)),base=gy-19;
+    const B=r.beats,dv=r.div,n=B*dv,base=gy-19,hA=Math.max(30,Math.min(band*0.5,band-118,base-top-(r.info?84:66)));
     for(let k=0;k<B;k++){const xa=x0+wl*k/B,xb=x0+wl*(k+1)/B;hop(x,xa,xb,base,hA,PAL.ink3,1.5,[3,7]);
       tx(x,String(k+1),(xa+xb)/2,base-hA-12,{f:`900 ${Math.round(Math.min(28,band*0.12))}px Archivo`,st:'condensed',c:PAL.ink3,al:'center'});}
     ln(x,x0-10,gy,x1+10,gy,PAL.ink,3);
@@ -649,7 +700,7 @@ function sHops(x,W,H,I,P){
       tx(x,P.syl[gi][s],X,gy+28,{f:`${s===0?'700':'400'} 12px "Space Mono"`,c:s===0?PAL.ink:PAL.ink2,al:'center'});}
     acc+=p;});
   ln(x,x0-10,gy,x1+10,gy,PAL.ink,3);
-  if(I.tap)tag(x,I.tap==='A'?`YOU TAP · GROUP STARTS · ${g.length} PER BAR`:`YOU TAP · EVERY PULSE · ${N} PER BAR`,x1,58,'right');
+  if(I.tap){const nar=W<560;tag(x,I.tap==='A'?`YOU TAP · GROUP STARTS · ${g.length}${nar?'':' PER BAR'}`:`YOU TAP · EVERY PULSE · ${N}${nar?'':' PER BAR'}`,nar?x0:x1,nar?84:58,nar?'left':'right');}
   let bx=x0,by=base,q=0;
   if(I.ph!=null){let gi=0;while(gi<g.length-1&&cN>=starts[gi]+g[gi])gi++;const p=g[gi],u=clamp((cN-starts[gi])/p,0,1),h=hMax*(0.4+0.6*p/maxP);
     bx=x0+wl*I.ph;by=base-h*4*u*(1-u);q=u<0.06?1-u/0.06:u>0.96?(u-0.96)/0.04:0;
@@ -779,7 +830,7 @@ function sListen(x,W,H,I,P){
   if(I.ph!=null){x.save();x.beginPath();x.arc(cx,cy,RR,-Math.PI/2,-Math.PI/2+TAU*I.ph);x.strokeStyle=PAL.ink;x.lineWidth=6;x.lineCap='butt';x.stroke();x.restore();
     const a=-Math.PI/2+TAU*I.ph;dot(x,cx+Math.cos(a)*RR,cy+Math.sin(a)*RR,8,PAL.ink);
     const gl=Math.exp(-I.ph*I.D*5);if(gl>0.03){x.save();x.globalAlpha=gl;dot(x,cx,cy-RR,10+(1-gl)*40,null,PAL.red,3);x.restore();}}
-  tx(x,P.sub||'THE CIRCLE PULSES WITH THE SOUND · THE RING SHOWS WHERE THE LOOP RESTARTS',cx,H-22,{f:'400 10.5px "Space Mono"',al:'center',c:PAL.ink2});
+  tx(x,P.sub||(W<560?'CIRCLE = SOUND · RING = WHERE THE LOOP RESTARTS':'THE CIRCLE PULSES WITH THE SOUND · THE RING SHOWS WHERE THE LOOP RESTARTS'),cx,H-22,{f:'400 10.5px "Space Mono"',al:'center',c:PAL.ink2});
 }
 const SCENES={bounce:sBounce,hops:sHops,arcs:sArcs,gears:sGears,neck:sNeck,swing:sSwing,listen:sListen};
 
@@ -1692,7 +1743,7 @@ function show(id){
   if(!modes[id])return;cur=id;
   tabs.forEach(t=>{t.setAttribute('aria-selected',t.dataset.tab===id);t.tabIndex=t.dataset.tab===id?0:-1;});
   MODS.forEach(m=>{$('#p-'+m.id).hidden=m.id!==id;});
-  {const m=MODS.find(x=>x.id===id);$('#uNum').textContent=m.n;$('#uTitle').textContent=m.kick+' · '+m.title;$('#uLede').textContent=m.lede;const q=$('#uQuiz');q.hidden=!m.topic;q.dataset.topic=m.topic||'';}
+  {const m=MODS.find(x=>x.id===id);$('#uNum').textContent=m.n;$('#uTitle').innerHTML=`<span class="tk">${id==='qz'?m.title:m.kick}</span><span class="tt2"> · ${id==='qz'?m.kick:m.title}</span>`;$('#uLede').textContent=m.lede;const q=$('#uQuiz');q.hidden=!m.topic;q.dataset.topic=m.topic||'';}
   $('#tempoRef').textContent=modes[id].tempoRef;$('#metroB').setAttribute('aria-pressed',clickOn());$('#metroB').title=id==='qz'?'Guide ticks and tap sound in the Arcade (M)':'Click track (M)';$('#midi').disabled=id==='qz';
   if(id!=='qz'&&take.state==='armed')take.state='idle';
   resync(false);refreshTapo();window.scrollTo({top:0});fitStage();
@@ -1758,6 +1809,14 @@ $$('.ub[data-sys]').forEach(b=>b.onclick=()=>{COUNT.sys=b.dataset.sys;sysSync();
 function themeLabel(){$('#theme').textContent=root.dataset.theme==='night'?'Day':'Night';}
 $('#theme').onclick=()=>{if(root.dataset.theme==='night'){delete root.dataset.theme;store.set('theme','day');}else{root.dataset.theme='night';store.set('theme','night');}readColors();themeLabel();};
 themeLabel();
+
+/* phone "more" sheet: proxies for Count-in, Export MIDI and the theme switch */
+{const sh=$('#sheet'),mb=$('#moreB');
+  const syncSheet=()=>{sh.querySelector('[data-proxy="cinB"]').setAttribute('aria-pressed',G.countIn);sh.querySelector('[data-proxy="theme"]').textContent=$('#theme').textContent;sh.querySelector('[data-proxy="midi"]').disabled=$('#midi').disabled;};
+  const close=()=>{sh.hidden=true;mb.setAttribute('aria-expanded','false');};
+  mb.onclick=e=>{e.stopPropagation();if(sh.hidden){syncSheet();sh.hidden=false;mb.setAttribute('aria-expanded','true');}else close();};
+  sh.querySelectorAll('[data-proxy]').forEach(b=>b.onclick=e=>{e.stopPropagation();$('#'+b.dataset.proxy).click();syncSheet();if(b.dataset.proxy!=='cinB')close();});
+  document.addEventListener('click',e=>{if(!sh.hidden&&!sh.contains(e.target))close();});}
 
 /* MIDI export */
 const GM={kick:36,snare:38,hat:42,ohat:46,rim:37,low:77,high:76,wood:75};
@@ -1837,4 +1896,3 @@ frame();
 </script>
 </body>
 </html>
-
