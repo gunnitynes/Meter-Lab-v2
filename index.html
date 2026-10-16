@@ -336,6 +336,10 @@ main{max-width:1440px;margin:0 auto;padding:14px 22px 90px}
 .pc.one::after{content:"";position:absolute;left:50%;bottom:-11px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--red)}
 .pc.hit{background:var(--blue)} .pc.miss{background:var(--paper);box-shadow:inset 0 0 0 4px var(--red)} .pc.extra{background:var(--red)}
 .take{display:grid;gap:10px}
+.tappad{display:grid;place-content:center;gap:4px;width:100%;min-height:96px;border:3px solid var(--ink);background:var(--yel);color:#161514;font:900 30px/1 var(--disp);font-stretch:80%;text-transform:uppercase;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.tappad small{font:700 10px var(--mono);letter-spacing:.06em}
+.tappad.hit{background:var(--red);color:#fff;transform:scale(.985)}
+@media (max-width:760px){.tappad{min-height:140px;font-size:36px}.tappad small{display:none}}
 .take canvas{width:100%;height:110px;display:block;border:3px solid var(--ink);background:var(--paper)}
 .tstat{font:900 26px var(--disp);font-stretch:80%;text-transform:uppercase}
 .tstat.go{color:var(--red)}
@@ -901,7 +905,7 @@ sw:{obj:['Describe swing as a percentage and as a ratio','Hear the difference be
  checks:[['At 66 % swing, where does the offbeat 16th land?','Two thirds of the way through the pair instead of halfway, so it is a third of a 16th late. That is a triplet feel.'],['Which swing setting equals a triplet feel?','66.7 % (2:1): the same rhythm as 12/8 in module 01.'],['What does 75 % swing look like written down?','A dotted 16th followed by a 32nd: the first note is three times as long as the second (3:1).'],['Does random humanising make a groove better?','Not by itself. Random jitter sounds sloppy. Consistent offsets (a late snare, early hats) are what players actually do.']],
  tracks:[['J Dilla, “Donuts”','unquantised, “drunk” MPC timing'],['D’Angelo, “Voodoo”','extremely laid-back drums and bass'],['Roger Linn’s MPC swing','the 50–75 % scale DAWs still use']]},
 qz:{obj:['Identify meters, groupings, ratios, patterns and swing by ear','Rebuild what you hear: program a grouping or a step pattern from memory','Perform it: supply a muted part in time, graded to the millisecond','Track accuracy per topic and climb three difficulty levels'],
- idea:'Three kinds of challenge, in rising order of difficulty. <b>Hear it</b>: name what plays. <b>Build it</b>: program what you heard, then compare yours with the original. <b>Play it</b>: one part drops out after the first cycle and you tap it in with J.',
+ idea:'Three kinds of challenge, in rising order of difficulty. <b>Hear it</b>: name what plays. <b>Build it</b>: program what you heard, then compare yours with the original. <b>Play it</b>: one part drops out after the first cycle and you tap it in on the TAP pad (or J).',
  listen:'Find the downbeat first (the kick). Count what you would nod to. Only then listen to how each beat splits. For ratios, follow the high voice alone, then the low voice alone. Slow the tempo if you need to: it is allowed.',
  studio:'Recognising a groove fast decides your grid setting, your quantise strength and your delay times before you touch the mouse. Combos multiply your score: three right in a row is ×1.75. Your accuracy per topic shows as a badge on each module.'}
 };
@@ -1331,7 +1335,7 @@ makeStage('sw',$('#stage-sw'),sSwing,()=>sw.P);
    07 · RHYTHM ARCADE
    ==================================================================== */
 const ARC_TOPICS=[{k:'meter',label:'Meter'},{k:'grouping',label:'Grouping'},{k:'poly',label:'Polyrhythm'},{k:'polymeter',label:'Polymeter'},{k:'pattern',label:'Pattern'},{k:'swing',label:'Swing'}];
-const KINDS=[{k:'hear',label:'Hear it',d:'Name what plays'},{k:'build',label:'Build it',d:'Program what you heard, then compare'},{k:'play',label:'Play it',d:'One part drops out: tap it in with J'}];
+const KINDS=[{k:'hear',label:'Hear it',d:'Name what plays'},{k:'build',label:'Build it',d:'Program what you heard, then compare'},{k:'play',label:'Play it',d:'One part drops out: tap it in on the TAP pad (or J)'}];
 const KIND_ICON={hear:'<svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/></svg>',
   build:'<svg width="44" height="44" viewBox="0 0 44 44"><rect x="4" y="4" width="36" height="36" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/></svg>',
   play:'<svg width="44" height="44" viewBox="0 0 44 44"><path d="M22 3 L41 39 L3 39Z" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/></svg>'};
@@ -1363,7 +1367,7 @@ const GEN={
     scene:'bounce',P:bounceP([['A',r]],'both',false),explain:`<b>${lab(r)}</b> is ${scName(r).toLowerCase()}: ${r.beats} beats per bar, each splitting into ${r.div}.`,
     open(){sc.A={...r};sc.B={beats:r.beats,div:r.div===2?3:2};sc.mode='both';scUpdate();show('sc');}};},
   'meter:play'(L){const r=pick(lvMeters(L)),n=r.beats*r.div;const ev=()=>{const o=[{t:0,layer:'K',v:'kick',g:0.6}];for(let i=0;i<n;i++){const t=i/n;if(i%r.div===0)o.push({t,layer:'T',v:'low',f:i===0?523:392,g:i===0?0.9:0.65,tap:true});else o.push({t,layer:'A',v:'low',f:392,g:0.16});}return o;};
-    const dur=()=>60/bpm()*r.beats;return {topic:'meter',kind:'play',prompt:`Tap the beats of ${lab(r)}`,hint:`First bar: listen. Then the beat accents drop out and only the pulses remain. Tap the ${r.beats} beats per bar with J.`,
+    const dur=()=>60/bpm()*r.beats;return {topic:'meter',kind:'play',prompt:`Tap the beats of ${lab(r)}`,hint:`First bar: listen. Then the beat accents drop out and only the pulses remain. Tap the ${r.beats} beats per bar on the TAP pad (or J).`,
     play:{layer:'T',demo:1,cycles:takeCycles(dur())},dur,ev,scene:'bounce',P:bounceP([['A',r]],'both',false),explain:`${lab(r)} has ${r.beats} beats, each ${r.div===2?'a quarter note split in two':'a dotted quarter split in three'}.`,
     open(){sc.A={...r};sc.B={beats:r.beats,div:r.div===2?3:2};scUpdate();show('sc');}};},
   'grouping:hear'(L){const N=pick(lvGroupN(L)),comps=adComps(N).filter(nonEq),ans=pick(comps),opts=shuffle([ans,...shuffle(comps.filter(g=>g!==ans)).slice(0,3)]);
@@ -1375,7 +1379,7 @@ const GEN={
     build:{type:'grouping',N,target:ans,mineEv:()=>adEventsOf(arc.build.g.length?arc.build.g:[N]),mineDur:()=>Math.max(1,arc.build.g.reduce((a,b)=>a+b,0)||N)*60/bpm()/2},
     dur:()=>N*60/bpm()/2,ev:()=>adEventsOf(ans),scene:'hops',P:hopsP(ans,`${N}/8`),explain:`The bar was <b>${ans.join('+')}</b>.`,open(){adSet(ans.slice(),8);show('ad');}};},
   'grouping:play'(L){const N=pick(lvGroupN(L)),ans=pick(adComps(N).filter(nonEq)),dur=()=>N*60/bpm()/2;
-    return {topic:'grouping',kind:'play',prompt:`Tap the group starts of ${ans.join('+')}`,hint:'First bar: listen to the kick. Then the kick drops out and only the even pulse remains. You play the kick with J.',
+    return {topic:'grouping',kind:'play',prompt:`Tap the group starts of ${ans.join('+')}`,hint:'First bar: listen to the kick. Then the kick drops out and only the even pulse remains. You play the kick on the TAP pad (or J).',
     play:{layer:'A',demo:1,cycles:takeCycles(dur())},dur,ev:()=>adEventsOf(ans),scene:'hops',P:hopsP(ans,`${N}/8`),explain:`${ans.join('+')}: the kick lands on pulses ${ans.reduce((a,p)=>{a.push((a.length?a[a.length-1]:1)+(a.length?ans[a.length-1]:0));return a;},[]).join(', ')}.`,open(){adSet(ans.slice(),8);show('ad');}};},
   'poly:hear'(L){const P=lvPoly(L),ans=pick(P),key=p=>p.join(':'),rev=[ans[1],ans[0]];const others=shuffle(P.filter(p=>key(p)!==key(ans)&&key(p)!==key(rev))).slice(0,2);
     const opts=shuffle([ans,rev,...others]),cyc=Math.max(...ans)>=5?4:2;
@@ -1384,7 +1388,7 @@ const GEN={
     scene:'arcs',P:arcsP([['A',ans[0]],['B',ans[1]]],cyc),explain:`Low voice <b>${ans[0]}</b>, high voice <b>${ans[1]}</b> in the same ${cyc}-beat cycle. Common grid: ${lcm(ans[0],ans[1])} cells.`,
     open(){pr.a=ans[0];pr.b=ans[1];pr.cOn=false;pr.cycle=cyc;prUpdate();show('pr');}};},
   'poly:play'(L){const ans=pick(lvPoly(L)),cyc=Math.max(...ans)>=5?4:2,tgt=Math.random()<0.5?'A':'B',dur=()=>60/bpm()*cyc;
-    return {topic:'poly',kind:'play',prompt:`Play the ${tgt==='A'?'low':'high'} voice of ${ans[0]}:${ans[1]}`,hint:`First cycle: listen. Then the ${tgt==='A'?'low':'high'} voice drops out: tap its ${tgt==='A'?ans[0]:ans[1]} hits per cycle with J while the other voice keeps going.`,
+    return {topic:'poly',kind:'play',prompt:`Play the ${tgt==='A'?'low':'high'} voice of ${ans[0]}:${ans[1]}`,hint:`First cycle: listen. Then the ${tgt==='A'?'low':'high'} voice drops out: tap its ${tgt==='A'?ans[0]:ans[1]} hits per cycle on the TAP pad (or J) while the other voice keeps going.`,
     play:{layer:tgt,demo:1,cycles:takeCycles(dur())},dur,ev:()=>prEventsOf(ans[0],ans[1],0),scene:'arcs',P:arcsP([['A',ans[0]],['B',ans[1]]],cyc),
     explain:`The ${tgt==='A'?'low':'high'} voice plays ${tgt==='A'?ans[0]:ans[1]} even hits per ${cyc}-beat cycle.`,open(){pr.a=ans[0];pr.b=ans[1];pr.cOn=false;pr.cycle=cyc;prUpdate();show('pr');}};},
   'pattern:hear'(L){const n=pick(lvPatN(L)),k=2+Math.floor(Math.random()*(n/2-1)),r=Math.random()<0.5?0:Math.floor(Math.random()*n);
@@ -1405,7 +1409,7 @@ const GEN={
     options:opts.map(x=>({id:String(x),big:`${x} steps`,small:`realigns after ${lcm(16,x)}`})),answer:String(n),dur:m.dur,ev:m.ev,scene:'gears',P:m.P,
     explain:`The blip loops every <b>${n} steps</b>. Against the 16-step bar it lines up again after ${m.L} steps: ${m.L/16} bar${m.L>16?'s':''}.`,open:m.open};},
   'polymeter:play'(L){const n=pick(L===1?[3,6]:L===2?[3,5,6]:[5,6,7]),m=pmQ(n);
-    return {topic:'polymeter',kind:'play',prompt:`Play a ${n}-step loop over 4/4`,hint:`First cycle: listen to the blip every ${n} steps. Then it drops out and you play it with J, while the kick keeps four on the floor. Count ${n} hat ticks between taps.`,
+    return {topic:'polymeter',kind:'play',prompt:`Play a ${n}-step loop over 4/4`,hint:`First cycle: listen to the blip every ${n} steps. Then it drops out and you play it on the TAP pad (or J), while the kick keeps four on the floor. Count ${n} hat ticks between taps.`,
     play:{layer:'B',demo:1,cycles:m.dur()>6?1:2},dur:m.dur,ev:m.ev,scene:'gears',P:m.P,
     explain:`A ${n}-step loop lands on a different part of the bar each time and comes home after ${m.L} steps (${m.L/16} bars).`,open:m.open};},
   'swing:hear'(L){const AM=L===1?[{v:50,b:'Straight',s:'50 %'},{v:66.5,b:'Triplet',s:'66 %'},{v:75,b:'Hard',s:'75 %'}]:[{v:50,b:'Straight',s:'50 %'},{v:58,b:'Light',s:'58 %'},{v:66.5,b:'Triplet',s:'66 %'},{v:75,b:'Hard',s:'75 %'}];
@@ -1473,7 +1477,7 @@ const GEN={
     scene:'neck',P:neckP([{L:'B',n:a.n,on:true,pat:pat.split('').map(Number)},{L:'A',n:a.n,on:false,pat:Array(a.n).fill(0)},{L:'C',n:a.n,on:false,pat:Array(a.n).fill(0)}],pat.split('').map(c=>c==='1'?'x':'·').join('')),
     explain:`That was the <b>${a.b}</b>: E(${a.k},${a.n})${a.r?` rotated by ${a.r}`:''}, gaps ${a.s.startsWith('E(')?euIntervals(pat.split('').map(Number)).join('+'):a.s}.`,open(){eu.u=a.n===12?'T':'16';eu.L.A={k:1,n:a.n,r:0,on:true};eu.L.B={k:a.k,n:a.n,r:a.r,on:true};eu.L.C.on=false;euUpdate();show('eu');}};},
   'pattern:play'(L){const n=L===1?8:pick([8,16]),k=n===8?pick([3,5]):pick([5,7]),pat=bjorklund(k,n).join(''),dur=()=>n*60/bpm()/4;
-    return {topic:'pattern',kind:'play',prompt:`Play the rim: E(${k},${n})`,hint:'First cycle: listen. Then the rim drops out and you tap it with J. The kick always marks step 1.',
+    return {topic:'pattern',kind:'play',prompt:`Play the rim: E(${k},${n})`,hint:'First cycle: listen. Then the rim drops out and you tap it on the TAP pad (or J). The kick always marks step 1.',
     play:{layer:'B',demo:1,cycles:takeCycles(dur())},dur,ev:()=>patEvents(pat),
     scene:'neck',P:neckP([{L:'B',n,on:true,pat:pat.split('').map(Number)},{L:'A',n,on:false,pat:Array(n).fill(0)},{L:'C',n,on:false,pat:Array(n).fill(0)}],pat.split('').map(c=>c==='1'?'x':'·').join('')),
     explain:`E(${k},${n}) has gaps ${euIntervals(pat.split('').map(Number)).join('+')}.`,open(){eu.u='16';eu.L.A={k:1,n,r:0,on:true};eu.L.B={k,n,r:0,on:true};eu.L.C.on=false;euUpdate();show('eu');}};},
@@ -1670,6 +1674,8 @@ function renderPlay(ap,q){
   const cv=el('canvas');cv.id='takeCv';
   if((take.state==='idle'||take.state==='done')&&!arc.done){if(take.state==='idle')st.textContent='Ready when you are';else if(take.res)st.textContent=`${take.res.hits}/${take.res.n} hits · ${Math.round(take.res.score*100)} %`;w.append(st,cv);const a=el('div','acts');const b=el('button','big pri',(arc.missed?'Try again →':'Start take →')+'<small>Enter</small>');b.type='button';b.onclick=takeBegin;a.appendChild(b);w.appendChild(a);}
   else{w.append(st,cv);if(take.state==='done'&&take.res)st.textContent=`${take.res.hits}/${take.res.n} hits · ${Math.round(take.res.score*100)} %`;}
+  if(take.state==='armed'){const pad=el('button','tappad','Tap here<small>or press J</small>');pad.type='button';pad.id='tapPad';
+    pad.addEventListener('pointerdown',e=>{e.preventDefault();tapJ(e.timeStamp);pad.classList.add('hit');setTimeout(()=>pad.classList.remove('hit'),90);});w.appendChild(pad);if(innerWidth<=960)requestAnimationFrame(()=>pad.scrollIntoView({block:'center',behavior:'smooth'}));}
   requestAnimationFrame(drawTake);
 }
 function takeBegin(){
@@ -1683,7 +1689,7 @@ function takeBegin(){
 function takeFrame(){
   if(take.state!=='armed'||!AC)return;
   const now=hearTime(),st=$('#takeStat');
-  if(st){let s,go=false;if(now<take.start)s='Get ready…';else if(now<take.demoEnd)s=`Listen · ${Math.ceil(take.demoEnd-now)}`;else if(now<take.end){s='Your turn · tap J';go=true;}else s='Scoring…';if(st.textContent!==s)st.textContent=s;st.classList.toggle('go',go);}
+  if(st){let s,go=false;if(now<take.start)s='Get ready…';else if(now<take.demoEnd)s=`Listen · ${Math.ceil(take.demoEnd-now)}`;else if(now<take.end){s='Your turn · tap!';go=true;}else s='Scoring…';if(st.textContent!==s)st.textContent=s;st.classList.toggle('go',go);}
   drawTake();
   if(now>take.end+0.25)takeGrade();
 }
