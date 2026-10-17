@@ -486,6 +486,34 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 .rs button{font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--paper);padding:3px 6px}
 .rs button[aria-pressed=true]{background:var(--red);color:#fff;border-color:var(--red)}
 @media (max-width:760px){.mpanel{border-left:0;padding-bottom:calc(80px + env(safe-area-inset-bottom))}}
+
+/* ---------- classroom ring ---------- */
+.ringh{position:fixed;inset:0;z-index:150;background:var(--paper);display:grid;grid-template-rows:auto minmax(0,1fr);background-image:radial-gradient(var(--hair) 1.2px,transparent 1.4px);background-size:24px 24px}
+.ringh[hidden]{display:none}
+.rh-top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 16px;background:var(--paper);border-bottom:3px solid var(--ink)}
+.rh-top h2{font:900 22px/1 var(--disp);font-stretch:112%;text-transform:uppercase;margin-right:auto}
+.rh-top h2 small{display:block;font:700 10px var(--mono);color:var(--ink2);margin-top:4px;letter-spacing:.04em}
+.rh-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:0}
+.rh-main canvas{width:100%;height:100%;display:block}
+.rh-side{border-left:3px solid var(--ink);background:var(--paper);overflow-y:auto;padding:12px;display:grid;gap:12px;align-content:start}
+.rh-side .lab{color:var(--ink2)}
+.rh-seat{display:grid;grid-template-columns:28px 10px minmax(0,1fr) auto auto auto;gap:6px;align-items:center;border:2px solid var(--ink);padding:5px 6px;font:700 11px var(--mono);text-transform:uppercase}
+.rh-seat b{font:900 18px var(--disp);font-stretch:62%;color:var(--red)}
+.rh-seat i{width:9px;height:9px;border-radius:50%;background:var(--hair)}
+.rh-seat i.ok{background:var(--green)}
+.rh-seat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-seat em{font-style:normal;color:var(--ink2);font-weight:400}
+.rh-seat button{border:2px solid var(--ink);background:var(--paper);width:24px;height:24px;padding:0;font:700 12px var(--mono)}
+.rh-join{display:flex;gap:12px;align-items:center}
+.rh-join .qr{width:84px;height:84px}
+.rh-join b{font:900 40px/0.9 var(--disp);font-stretch:62%;letter-spacing:.06em;color:var(--red)}
+.ringv{position:fixed;inset:0;z-index:160;background:var(--paper);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.ringv[hidden]{display:none}
+.ringv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ring-unlock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:min(78vw,340px);aspect-ratio:1;border-radius:50%;border:4px solid var(--ink);background:var(--yel);color:#161514;font:900 30px/1.05 var(--disp);font-stretch:80%;text-transform:uppercase;box-shadow:8px 8px 0 var(--ink)}
+.ring-unlock[hidden]{display:none}
+.ring-x{position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top));z-index:2;font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--paper);padding:6px 9px}
+@media (max-width:900px){.rh-main{grid-template-columns:minmax(0,1fr)}.rh-side{border-left:0;border-top:3px solid var(--ink);max-height:38vh}}
 </style>
 </head>
 <body>
@@ -521,6 +549,8 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 <main id="main"></main>
 <div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="liveB">MIDI out</button><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
 <div class="mpanel" id="mpanel" hidden role="dialog" aria-modal="false" aria-labelledby="mpTitle"></div>
+<div class="ringh" id="ringh" hidden role="dialog" aria-label="Classroom ring conductor"></div>
+<div class="ringv" id="ringv" hidden role="dialog" aria-label="Classroom ring"><canvas id="ringCv"></canvas><button class="ring-unlock" id="ringUnlock" type="button">Tap to join<br>the ring</button><button class="ring-x" id="ringX" type="button">Leave ring</button></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -1951,15 +1981,17 @@ async function hostRoom(){
     peer.on('disconnected',()=>{try{peer.reconnect();}catch(e){}});
     peer.on('connection',conn=>{
       conn.on('open',()=>{const used=new Set([...ROOM.conns.values()].map(c=>c.ch));let ch=1;while((used.has(ch)||ch===10)&&ch<16)ch++;
-        ROOM.conns.set(conn.peer,{conn,ch,name:'Guest',muted:false,last:0});conn.send({t:'welcome',ch,bpm:bpmV,anchor:ROOM.anchor});renderLive();});
+        ROOM.conns.set(conn.peer,{conn,ch,name:'Guest',muted:false,last:0,ready:false,errs:[]});conn.send({t:'welcome',ch,bpm:bpmV,anchor:ROOM.anchor});renderLive();if(RING.open)setTimeout(ringSendAll,400);renderRingHost();});
       conn.on('data',m=>hostData(conn,m));
-      conn.on('close',()=>{ROOM.conns.delete(conn.peer);renderLive();});
+      conn.on('close',()=>{ROOM.conns.delete(conn.peer);renderLive();if(RING.open)ringSendAll();renderRingHost();});
       conn.on('error',()=>{ROOM.conns.delete(conn.peer);renderLive();});});};
   tryOpen(4);
 }
 function hostData(conn,m){
   const st=ROOM.conns.get(conn.peer);if(!st||!m||typeof m!=='object')return;
-  if(m.t==='hi'){st.name=String(m.name||'Guest').slice(0,24);renderLive();}
+  if(m.t==='hi'){st.name=String(m.name||'Guest').slice(0,24);renderLive();renderRingHost();}
+  else if(m.t==='ringready'){st.ready=true;renderRingHost();}
+  else if(m.t==='ringtap'){st.errs.push(clamp(+m.e||0,-500,500));if(st.errs.length>12)st.errs.shift();st.lastTap=performance.now();}
   else if(m.t==='ping'){conn.send({t:'pong',a:m.a,b:performance.now()});}
   else if(m.t==='ev'&&Array.isArray(m.d)){
     st.last=performance.now();if(st.muted)return;const now=performance.now(),lat=clamp(+m.l||0,0,400),ch=st.ch-1;
@@ -1982,6 +2014,7 @@ async function joinRoom(code){
 }
 function guestData(m){
   if(!m||typeof m!=='object')return;
+  if(m.t==='ring'||m.t==='ringprep'||m.t==='ringstop'){ringGuestData(m);return;}
   if(m.t==='welcome'){ROOM.ch=m.ch;ROOM.hostTempo={bpm:m.bpm,anchor:m.anchor};if(ROOM.lock)setBpm(m.bpm,'room');renderLive();ledSync();}
   else if(m.t==='tempo'){ROOM.hostTempo={bpm:m.bpm,anchor:m.anchor};if(ROOM.lock&&bpmV!==m.bpm)setBpm(m.bpm,'room');}
   else if(m.t==='pong'){const c=performance.now(),rtt=c-m.a;ROOM.samples.push({rtt,off:m.b-(m.a+c)/2});if(ROOM.samples.length>10)ROOM.samples.shift();
@@ -1989,7 +2022,7 @@ function guestData(m){
 }
 function roomPing(){if(ROOM.role==='guest'&&ROOM.host&&ROOM.host.open)ROOM.host.send({t:'ping',a:performance.now()});}
 function roomFlush(){if(ROOM.role!=='guest'||!ROOM.q.length)return;if(ROOM.host&&ROOM.host.open){try{ROOM.host.send({t:'ev',l:Math.round(ROOM.rtt/2),d:ROOM.q});}catch(e){}}ROOM.q=[];}
-function roomLeave(quiet){try{if(ROOM.peer)ROOM.peer.destroy();}catch(e){}ROOM.peer=null;ROOM.host=null;ROOM.conns.clear();ROOM.role=null;ROOM.code='';ROOM.ch=null;ROOM.hostTempo=null;ROOM.q=[];ROOM.samples=[];if(!quiet)roomStatus('');ledSync();}
+function roomLeave(quiet){if(RING.open)ringCloseHost(true);if(RG.prep||RG.on)ringGuestHide(true);try{if(ROOM.peer)ROOM.peer.destroy();}catch(e){}ROOM.peer=null;ROOM.host=null;ROOM.conns.clear();ROOM.role=null;ROOM.code='';ROOM.ch=null;ROOM.hostTempo=null;ROOM.q=[];ROOM.samples=[];if(!quiet)roomStatus('');ledSync();}
 setInterval(()=>{const now=performance.now();if(ROOM.role==='guest'&&now-ROOM.pingT>2000){ROOM.pingT=now;roomPing();}if(ROOM.role==='host'&&now-ROOM.tempoT>1000){ROOM.tempoT=now;roomBroadcast();}},250);
 /* shared bar grid: every play press starts on the next room downbeat */
 function roomGrid(){
@@ -2002,7 +2035,7 @@ function roomAlignStart(){
   if(t>AC.currentTime){S.t0=t;S.cs=t;S.idx=0;S.cinN=0;}
 }
 function roomTempoChanged(oldBpm){
-  if(ROOM.role!=='host')return;const now=performance.now(),ob=4*60000/oldBpm,ph=(((now-ROOM.anchor)/ob)%1+1)%1;ROOM.anchor=now-ph*(4*60000/bpmV);roomBroadcast();
+  if(ROOM.role!=='host')return;if(RING.on)setTimeout(ringStartHost,0);const now=performance.now(),ob=4*60000/oldBpm,ph=(((now-ROOM.anchor)/ob)%1+1)%1;ROOM.anchor=now-ph*(4*60000/bpmV);roomBroadcast();
 }
 function flashGuest(id){const e=document.querySelector(`.rs[data-id="${CSS.escape(id)}"] i`);if(e){e.classList.add('hit');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('hit'),110);}ledHit();}
 function ledHit(){const l=$('#mled');if(!l)return;l.classList.add('hit');clearTimeout(l._t);l._t=setTimeout(()=>l.classList.remove('hit'),90);}
@@ -2044,7 +2077,7 @@ function renderLive(){
     h+=ROOM.peer&&ROOM.peer.open?`<div class="code"><button class="qr" type="button" id="rQR" aria-label="Show the QR code large" title="Click to show it large for the class"></button><div><b>${ROOM.code}</b><small>Room code · tap the QR to enlarge</small></div></div>`:'';
     h+=`<div class="mp-st ${MIDI.out?'ok':'warn'}"><i class="mled ${MIDI.out?'on':''}"></i>${MIDI.out?'Forwarding guests to '+MIDI.out.name:'Pick an output port above so guests reach your DAW'}</div>`;
     h+=`<div class="mp-row"><span class="lab">${ROOM.conns.size} guest${ROOM.conns.size===1?'':'s'} connected</span><div class="roster">${[...ROOM.conns.entries()].map(([id,c])=>`<div class="rs" data-id="${id}"><i></i><span>${c.name.replace(/</g,'&lt;')}</span><em>ch ${c.ch}</em><button type="button" data-mute="${id}" aria-pressed="${c.muted}">${c.muted?'Muted':'Mute'}</button><button type="button" data-kick="${id}">×</button></div>`).join('')||'<p class="mp-fine">Waiting for students…</p>'}</div></div>`;
-    h+=`<div class="mp-row" id="rBufRow"></div><div class="acts"><button class="big" type="button" id="rLeave">Close room</button></div>`;
+    h+=`<div class="mp-row" id="rBufRow"></div><div class="acts"><button class="big pri" type="button" id="rRing">Open the classroom ring →</button><button class="big" type="button" id="rLeave">Close room</button></div><p class="mp-fine">The ring turns every student’s phone into one pulse of the rhythm, so the beat travels around the room.</p>`;
   }else{
     h+=`<div class="mp-st ${ROOM.host&&ROOM.host.open?'ok':'warn'}"><i class="mled ${ROOM.host&&ROOM.host.open?'room':''}"></i>${ROOM.host&&ROOM.host.open?`In room ${ROOM.code}${ROOM.ch?` · you are MIDI channel ${ROOM.ch}`:''}`:'Connecting to '+ROOM.code+'…'}</div><p class="mp-fine" id="roomStats"></p>`;
     h+=`<div class="mp-row"><span class="lab">Send to the room</span><div id="rSend"></div></div><div class="acts"><button class="big" type="button" id="rLeave">Leave room</button></div>`;
@@ -2066,6 +2099,7 @@ function renderLive(){
   const cd=$('#rCode');if(cd){cd.oninput=()=>{cd.value=cd.value.toUpperCase();ROOM.join=cd.value;};cd.onkeydown=e=>{if(e.key==='Enter')joinRoom(cd.value);};}
   const jb=$('#rJoin');if(jb)jb.onclick=()=>{ensureAudio();joinRoom($('#rCode').value);};
   const lv=$('#rLeave');if(lv)lv.onclick=()=>roomLeave();
+  const rr=$('#rRing');if(rr)rr.onclick=()=>{closeLive();ringOpenHost();};
   P.querySelectorAll('[data-mute]').forEach(b=>b.onclick=()=>{const c=ROOM.conns.get(b.dataset.mute);if(c){c.muted=!c.muted;renderLive();}});
   P.querySelectorAll('[data-kick]').forEach(b=>b.onclick=()=>{const c=ROOM.conns.get(b.dataset.kick);if(c){try{c.conn.close();}catch(e){}ROOM.conns.delete(b.dataset.kick);renderLive();}});
   const qr=$('#rQR');if(qr){needQR().then(()=>{qr.innerHTML='';new QRCode(qr,{text:joinURL(),width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}).catch(()=>{qr.textContent=ROOM.code;});qr.onclick=showBigQR;}
@@ -2081,6 +2115,189 @@ function closeLive(){$('#mpanel').hidden=true;}
 $('#liveB').onclick=()=>{const P=$('#mpanel');if(P.hidden)openLive();else closeLive();};
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const ov=$('#qrbig');if(ov&&!ov.hidden){ov.hidden=true;return;}if(!$('#mpanel').hidden)closeLive();});
 {const rp=new URLSearchParams(location.search).get('room');if(rp){ROOM.join=rp.toUpperCase().slice(0,4);setTimeout(openLive,300);}}
+
+
+/* ====================================================================
+   CLASSROOM RING — every phone becomes one bead of the rhythm.
+   The host (the teacher's laptop, ideally on the projector) picks a
+   pattern; each guest phone is given one or more steps and schedules
+   its own sound from the shared room clock, so the beat travels
+   around the room without depending on Wi-Fi timing.
+   ==================================================================== */
+const RCOL=c=>({red:PAL.red,blue:PAL.blue,yel:PAL.yel,ink:PAL.ink}[c]||PAL.hair);
+const RTXT=c=>c==='yel'?'#161514':c==='ink'?PAL.paper:'#fff';
+const stepO=o=>Object.assign({s:'off',g:0.6,c:'off',lab:'·'},o);
+function cfgMeter(beats,div,name){const n=beats*div,steps=[];for(let i=0;i<n;i++){const head=i%div===0,down=i===0;steps.push(stepO({s:down?'kick':head?'low':'tick',g:down?0.95:head?0.7:0.4,c:down?'red':head?'blue':'ink',lab:sylOf(div,i%div)}));}
+  return {name:name||`${sigOf({beats,div}).join('/')} · ${beats} beats of ${div}`,n,cycleBeats:n/2,steps};}
+function cfgGroups(g,unit,name){const n=g.reduce((a,b)=>a+b,0),steps=[];g.forEach((p,gi)=>{for(let k=0;k<p;k++){const head=k===0,down=head&&gi===0;steps.push(stepO({s:down?'kick':head?'low':'tick',g:down?0.95:head?0.7:0.4,c:down?'red':head?(p===3?'red':'blue'):'ink',lab:sylOf(p,k)}));}});
+  return {name:name||`${g.join('+')} · additive`,n,cycleBeats:n*4/(unit||8),steps};}
+function cfgPoly(a,b,cyc,name){const L=lcm(a,b),steps=[];for(let i=0;i<L;i++){const A=i%(L/a)===0,B=i%(L/b)===0;
+  steps.push(stepO(A&&B?{s:'both',g:0.9,c:'red',lab:'A+B'}:A?{s:'low',g:0.8,c:'yel',lab:'A'}:B?{s:'high',g:0.8,c:'blue',lab:'B'}:{}));}
+  return {name:name||`Polyrhythm ${a}:${b}`,n:L,cycleBeats:cyc||(L<=6?2:4),steps};}
+function cfgEuclid(k,n,r,beats,name){const p=euRot(bjorklund(k,n),r||0),first=p.indexOf(1);
+  return {name:name||`E(${k},${n})`,n,cycleBeats:beats||(n===16?4:n/2),steps:p.map((v,i)=>stepO(v?{s:i===first?'kick':'rim',g:i===first?0.9:0.8,c:i===first?'red':'blue',lab:'x'}:{}))};}
+const RING_PATS=[
+  {k:'mod',label:'Open module'},
+  {k:'34',label:'3/4',make:()=>cfgMeter(3,2,'3/4 · three beats of two')},
+  {k:'68',label:'6/8',make:()=>cfgMeter(2,3,'6/8 · two beats of three')},
+  {k:'223',label:'2+2+3',make:()=>cfgGroups([2,2,3],8,'7/8 · 2+2+3')},
+  {k:'332',label:'3+3+2',make:()=>cfgGroups([3,3,2],8,'Tresillo · 3+3+2')},
+  {k:'32',label:'3:2',make:()=>cfgPoly(3,2,2)},
+  {k:'43',label:'4:3',make:()=>cfgPoly(4,3,4)},
+  {k:'e58',label:'Cinquillo',make:()=>cfgEuclid(5,8,0,4,'Cinquillo · E(5,8)')},
+  {k:'e716',label:'Samba',make:()=>cfgEuclid(7,16,0,4,'Samba · E(7,16)')},
+];
+function cfgFromModule(){
+  if(cur==='sc')return cfgMeter(sc.A.beats,sc.A.div);
+  if(cur==='ad')return cfgGroups(ad.g,ad.u);
+  if(cur==='pr')return cfgPoly(pr.a,pr.b,pr.cycle);
+  if(cur==='eu'){const L=eu.L.B.on?'B':eu.L.A.on?'A':'C',x=eu.L[L];return cfgEuclid(x.k,x.n,x.r,x.n/EU_UNIT[eu.u].pb);}
+  return null;
+}
+function ringVoice(st,at){const g=st.g;switch(st.s){
+  case 'kick':voice({v:'kick',g},at);voice({v:'low',f:523,g:g*0.55},at);break;
+  case 'low':voice({v:'low',f:392,g},at);break;
+  case 'high':voice({v:'high',f:1175,g},at);break;
+  case 'both':voice({v:'kick',g:g*0.8},at);voice({v:'high',f:1568,g},at);break;
+  case 'rim':voice({v:'rim',g},at);break;
+  case 'tick':voice({v:'wood',g:g*0.7,f:2400},at);break;}}
+/* one scheduler for host guide and guests: o={cfg,start(local perf ms),bpm,mine:Set|null,play,q,hits} */
+function ringRun(o){
+  if(!o||!o.cfg||!AC)return;const cyc=o.cfg.cycleBeats*60000/o.bpm,st=cyc/o.cfg.n,now=performance.now(),hz=now+140;
+  if(o.q==null)o.q=Math.max(0,Math.ceil((now+15-o.start)/st));
+  let g=0;while(g++<96){const tp=o.start+o.q*st;if(tp>hz)break;const i=o.q%o.cfg.n,sp=o.cfg.steps[i];
+    if(sp.s!=='off'&&(!o.mine||o.mine.has(i))){if(o.play)ringVoice(sp,Math.max(perfToCtx(tp),AC.currentTime));o.hits.push({tp,i});}o.q++;}
+  o.hits=o.hits.filter(h=>h.tp>now-2000);
+}
+const ringStepMs=o=>o.cfg.cycleBeats*60000/o.bpm/o.cfg.n;
+
+/* ---------- host / conductor ---------- */
+const RING={open:false,on:false,pat:'mod',mode:'play',guide:false,cfg:null,start:0,order:[],run:null};
+function ringOrder(){const ids=[...ROOM.conns.keys()];RING.order=RING.order.filter(id=>ids.includes(id)).concat(ids.filter(id=>!RING.order.includes(id)));return RING.order;}
+function stepsFor(j,G,n){if(G<=0)return [];if(G<=n){const o=[];for(let i=0;i<n;i++)if(Math.floor(i*G/n)===j)o.push(i);return o;}return [Math.floor(j*n/G)];}
+function ringCfg(){const p=RING_PATS.find(x=>x.k===RING.pat);let c=p.k==='mod'?cfgFromModule():p.make();if(!c){toast('This module has no single ring: showing 3/4');c=cfgMeter(3,2,'3/4 · three beats of two');}return c;}
+function ringSendAll(){
+  const ord=ringOrder(),G=ord.length;
+  ord.forEach((id,j)=>{const c=ROOM.conns.get(id);if(!c)return;c.seat=j+1;c.steps=RING.cfg?stepsFor(j,G,RING.cfg.n):[];
+    try{c.conn.send(RING.on?{t:'ring',cfg:RING.cfg,mine:c.steps,seat:j+1,seats:G,start:RING.start,bpm:bpmV,mode:RING.mode}:{t:'ringprep',seat:j+1,seats:G,name:RING.cfg?RING.cfg.name:''});}catch(e){}});
+}
+function ringOpenHost(){if(ROOM.role!=='host')return;RING.open=true;if(S.playing)setPlaying(false);RING.cfg=ringCfg();$('#ringh').hidden=false;ringSendAll();renderRingHost();}
+function ringCloseHost(quiet){if(RING.on)ringStopHost();RING.open=false;$('#ringh').hidden=true;if(!quiet)ROOM.conns.forEach(c=>{try{c.conn.send({t:'ringstop',close:true});}catch(e){}});}
+function ringStartHost(){ensureAudio();RING.cfg=ringCfg();const beat=60000/bpmV,now=performance.now();RING.start=ROOM.anchor+Math.ceil((now+1500-ROOM.anchor)/beat)*beat;RING.on=true;
+  ROOM.conns.forEach(c=>{c.errs=[];});RING.run={cfg:RING.cfg,start:RING.start,bpm:bpmV,mine:null,play:RING.guide,q:null,hits:[]};ringSendAll();renderRingHost();}
+function ringStopHost(){RING.on=false;RING.run=null;ROOM.conns.forEach(c=>{try{c.conn.send({t:'ringstop'});}catch(e){}});renderRingHost();}
+function ringMove(id,d){const o=ringOrder(),i=o.indexOf(id),j=i+d;if(i<0||j<0||j>=o.length)return;[o[i],o[j]]=[o[j],o[i]];ringSendAll();renderRingHost();}
+function renderRingHost(){
+  const H=$('#ringh');if(!H||H.hidden)return;const ord=ringOrder(),G=ord.length,cfg=RING.cfg||ringCfg();
+  const errTxt=c=>{if(!c.errs||!c.errs.length)return '';const m=c.errs.reduce((a,b)=>a+Math.abs(b),0)/c.errs.length,pb=m/(60000/bpmV)*100;return pb<4?'tight':pb<10?'close':'loose';};
+  H.innerHTML=`<div class="rh-top"><h2>Classroom ring<small>${cfg.name} · ${cfg.n} beads · ${G} phone${G===1?'':'s'}</small></h2><div id="rhPat"></div><div id="rhMode"></div><div id="rhGuide"></div>
+    <div class="bpm"><button type="button" id="rhDn">−</button><output>${bpmV}</output><button type="button" id="rhUp">+</button></div>
+    <button class="big ${RING.on?'':'pri'}" type="button" id="rhGo">${RING.on?'Stop':'Start the ring →'}</button><button class="big" type="button" id="rhX">Close</button></div>
+    <div class="rh-main"><canvas id="rhCv" aria-label="The ring of phones"></canvas><aside class="rh-side">
+      <div class="rh-join"><button class="qr" type="button" id="rhQR" aria-label="Show the QR code large"></button><div><b>${ROOM.code}</b><p class="lab">scan to join</p></div></div>
+      <p class="lab">Seats · stand in this order, clockwise from the top</p>
+      ${ord.map((id,j)=>{const c=ROOM.conns.get(id),st=stepsFor(j,G,cfg.n);return `<div class="rh-seat"><b>${j+1}</b><i class="${c.ready?'ok':''}" title="${c.ready?'Ready':'Not tapped in yet'}"></i><span>${c.name.replace(/</g,'&lt;')}</span><em>${st.map(x=>x+1).join(',')}${RING.mode==='perform'?' '+errTxt(c):''}</em><button type="button" data-up="${id}" aria-label="Move up">↑</button><button type="button" data-dn="${id}" aria-label="Move down">↓</button></div>`;}).join('')||'<p class="mp-fine">Waiting for phones. Students scan the QR code.</p>'}
+      <p class="mp-fine">${RING.mode==='perform'?'Perform: each phone shows when its bead is due and the student taps it in. Their timing appears next to their name.':'Play: each phone sounds and flashes on its own bead.'} Phones with a green dot have tapped in and can make sound.</p>
+    </aside></div>`;
+  seg($('#rhPat'),RING_PATS,it=>RING.pat===it.k,it=>{RING.pat=it.k;RING.cfg=ringCfg();if(RING.on)ringStartHost();else{ringSendAll();renderRingHost();}});
+  seg($('#rhMode'),[{k:'play',label:'Play'},{k:'perform',label:'Perform'}],it=>RING.mode===it.k,it=>{RING.mode=it.k;if(RING.on)ringSendAll();renderRingHost();});
+  seg($('#rhGuide'),[{label:'Guide on laptop'}],()=>RING.guide,()=>{RING.guide=!RING.guide;if(RING.run){RING.run.play=RING.guide;}});
+  $('#rhDn').onclick=()=>{setBpm(bpmV-2);renderRingHost();};$('#rhUp').onclick=()=>{setBpm(bpmV+2);renderRingHost();};
+  $('#rhGo').onclick=()=>{RING.on?ringStopHost():ringStartHost();};$('#rhX').onclick=()=>ringCloseHost();
+  H.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>ringMove(b.dataset.up,-1));H.querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>ringMove(b.dataset.dn,1));
+  const q=$('#rhQR');needQR().then(()=>{q.innerHTML='';new QRCode(q,{text:joinURL(),width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}).catch(()=>{});q.onclick=showBigQR;
+}
+setInterval(()=>{if(RING.open&&RING.mode==='perform'&&RING.on)renderRingHostSeats();},1500);
+function renderRingHostSeats(){const H=$('#ringh');if(!H||H.hidden)return;const ord=ringOrder(),G=ord.length,cfg=RING.cfg;if(!cfg)return;
+  H.querySelectorAll('.rh-seat').forEach((row,j)=>{const c=ROOM.conns.get(ord[j]);if(!c)return;const em=row.querySelector('em');let t='';if(c.errs&&c.errs.length){const m=c.errs.reduce((a,b)=>a+Math.abs(b),0)/c.errs.length,pb=m/(60000/bpmV)*100;t=pb<4?' tight':pb<10?' close':' loose';}
+    em.textContent=stepsFor(j,G,cfg.n).map(x=>x+1).join(',')+t;row.querySelector('i').className=c.ready?'ok':'';});}
+function drawRingHost(){
+  const cv=$('#rhCv');if(!cv)return;const d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W||!H)return;
+  if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){cv.width=Math.round(W*d);cv.height=Math.round(H*d);}
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
+  const cfg=RING.cfg||ringCfg(),n=cfg.n,cx=W/2,cy=H/2+8,R=Math.min(W,H)*0.34,now=performance.now();
+  const st=60000*cfg.cycleBeats/bpmV/n,pos=RING.on&&now>=RING.start?((now-RING.start)/st):null;
+  const ord=ringOrder(),G=ord.length;
+  dot(x,cx,cy,R,null,PAL.hair,2);
+  if(pos!=null){const a=-Math.PI/2+TAU*((pos%n)/n);dot(x,cx+Math.cos(a)*R,cy+Math.sin(a)*R,7,PAL.ink);}
+  const br=Math.min(30,Math.PI*R/n*0.42);
+  for(let i=0;i<n;i++){const a=-Math.PI/2+TAU*i/n,X=cx+Math.cos(a)*R,Y=cy+Math.sin(a)*R,sp=cfg.steps[i];
+    let gl=0;if(pos!=null){const dq=pos-Math.floor(pos/n)*n-i,age=(dq<0?dq+n:dq)*st;gl=sp.s!=='off'?Math.exp(-age/90):0;}
+    if(sp.s==='off')dot(x,X,Y,br*0.45,null,PAL.ink3,2);else{dot(x,X,Y,br*(1+gl*0.45),RCOL(sp.c),PAL.ink,3);}
+    tx(x,sp.s==='off'?'':sp.lab,X,Y+5,{f:`900 ${Math.round(br*0.62)}px Archivo`,st:'condensed',al:'center',c:RTXT(sp.c)});
+    const owners=ord.filter((id,j)=>stepsFor(j,G,n).includes(i)).map(id=>ROOM.conns.get(id)).filter(Boolean);
+    const lx=cx+Math.cos(a)*(R+br+26),ly=cy+Math.sin(a)*(R+br+26);
+    tx(x,owners.length?owners.map(c=>c.name).join(' · ').slice(0,22):`(${i+1})`,lx,ly+4,{f:'700 12px "Space Mono"',al:Math.cos(a)>0.3?'left':Math.cos(a)<-0.3?'right':'center',c:owners.length?PAL.ink:PAL.ink3});
+  }
+  tx(x,RING.on?(pos==null?'STARTING…':`BEAD ${Math.floor(pos%n)+1}`):'PRESS START',cx,cy-6,{f:'900 30px Archivo',st:'condensed',al:'center'});
+  tx(x,cfg.name.toUpperCase(),cx,cy+20,{f:'700 11px "Space Mono"',al:'center',c:PAL.ink2});
+}
+
+/* ---------- guest / phone ---------- */
+const RG={prep:false,on:false,unlocked:false,cfg:null,seat:0,seats:0,mode:'play',run:null,fb:null,name:'',lock:null,silent:null};
+function ringGuestData(m){
+  if(m.t==='ringprep'){RG.prep=true;RG.seat=m.seat;RG.seats=m.seats;RG.name=m.name||'';if(!RG.on)RG.cfg=null;ringGuestShow();}
+  else if(m.t==='ring'){RG.prep=true;RG.on=true;RG.cfg=m.cfg;RG.seat=m.seat;RG.seats=m.seats;RG.mode=m.mode;RG.fb=null;
+    RG.run={cfg:m.cfg,start:m.start-ROOM.offset,bpm:m.bpm,mine:new Set(m.mine),play:m.mode==='play',q:null,hits:[]};if(S.playing)setPlaying(false);ringGuestShow();}
+  else if(m.t==='ringstop'){RG.on=false;RG.run=null;if(m.close)ringGuestHide(true);}
+}
+function ringGuestShow(){$('#ringv').hidden=false;$('#ringUnlock').hidden=RG.unlocked;}
+function ringGuestHide(){$('#ringv').hidden=true;RG.prep=false;RG.on=false;RG.run=null;try{if(RG.lock)RG.lock.release();}catch(e){}RG.lock=null;}
+function silentURL(){const sr=8000,n=sr/2,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,t)=>[...t].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+  return URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}
+$('#ringUnlock').onclick=async()=>{
+  ensureAudio();
+  try{if(!RG.silent){RG.silent=new Audio(silentURL());RG.silent.loop=true;RG.silent.setAttribute('playsinline','');}await RG.silent.play();}catch(e){} /* lets iPhone play sound with the silent switch on */
+  try{if(navigator.wakeLock)RG.lock=await navigator.wakeLock.request('screen');}catch(e){}
+  voice({v:'wood',g:0.5,f:2400},AC.currentTime+0.02);
+  RG.unlocked=true;$('#ringUnlock').hidden=true;try{if(ROOM.host&&ROOM.host.open)ROOM.host.send({t:'ringready'});}catch(e){}
+};
+$('#ringX').onclick=()=>ringGuestHide();
+$('#ringCv').addEventListener('pointerdown',e=>{
+  if(!RG.on||!RG.unlocked||RG.mode!=='perform'||!RG.run)return;e.preventDefault();
+  const tp=e.timeStamp,st=ringStepMs(RG.run);let best=null;
+  RG.run.hits.forEach(h=>{if(best==null||Math.abs(tp-h.tp)<Math.abs(tp-best.tp))best=h;});
+  if(!best||Math.abs(tp-best.tp)>st*0.6){RG.fb={t:performance.now(),txt:'Wait for your bead',c:PAL.ink2};return;}
+  const err=tp-best.tp,pb=Math.abs(err)/(60000/RG.run.bpm)*100;ringVoice(RG.cfg.steps[best.i],AC.currentTime);
+  RG.fb={t:performance.now(),txt:pb<4?'On it!':pb<10?(err<0?'A bit early':'A bit late'):(err<0?'Early':'Late'),c:pb<4?PAL.blue:pb<10?PAL.ink:PAL.red,i:best.i};
+  try{if(ROOM.host&&ROOM.host.open)ROOM.host.send({t:'ringtap',e:Math.round(err)});}catch(e2){}
+});
+function drawRingGuest(){
+  const cv=$('#ringCv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W||!H)return;
+  if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){cv.width=Math.round(W*d);cv.height=Math.round(H*d);}
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);const now=performance.now();
+  const cfg=RG.cfg,mine=RG.run?[...RG.run.mine].sort((a,b)=>a-b):[];let curI=cfg&&mine.length?(mine.find(i=>cfg.steps[i].s!=='off')??mine[0]):null;
+  if(RG.run&&cfg){let last=null,next=null;RG.run.hits.forEach(h=>{if(h.tp<=now&&(last==null||h.tp>last.tp))last=h;if(h.tp>now&&(next==null||h.tp<next.tp))next=h;});const stp=ringStepMs(RG.run);curI=last&&now-last.tp<stp*0.6?last.i:next?next.i:last?last.i:curI;}
+  const sp=cfg&&curI!=null?cfg.steps[curI]:null;
+  let flash=0,flashC=sp?RCOL(sp.c):PAL.red;
+  if(RG.run)RG.run.hits.forEach(h=>{const age=now-h.tp;if(age>=0&&age<260){const f=1-age/260;if(f>flash){flash=f;flashC=RCOL(cfg.steps[h.i].c);}}});
+  if(RG.mode==='perform')flash*=0.35;
+  x.fillStyle=PAL.paper;x.fillRect(0,0,W,H);
+  if(flash>0){x.save();x.globalAlpha=flash;x.fillStyle=flashC;x.fillRect(0,0,W,H);x.restore();}
+  const m=Math.min(W,H);
+  tx(x,(cfg?cfg.name:(RG.name||'Classroom ring')).toUpperCase(),20,36,{f:'700 12px "Space Mono"'});
+  tx(x,RG.seat?(mine.length>3?`BEADS ${mine[0]+1}–${mine[mine.length-1]+1}`:mine.length>1?`BEADS ${mine.map(i=>i+1).join(' + ')}`:`BEAD ${mine[0]!=null?mine[0]+1:RG.seat}`):'',20,80,{f:`900 ${Math.round(m*0.11)}px Archivo`,st:'condensed'});
+  if(cfg&&RG.seats)tx(x,`seat ${RG.seat} of ${RG.seats} · ${cfg.n} beads in the ring`,20,104,{f:'400 12px "Space Mono"',c:PAL.ink2});
+  const cy=H*0.44,R=m*0.26;
+  if(!cfg){tx(x,RG.unlocked?'You are in. Waiting for the teacher to start…':'',W/2,H*0.8,{f:'700 13px "Space Mono"',al:'center',c:PAL.ink2});return;}
+  const silent=!sp||sp.s==='off';
+  dot(x,W/2,cy,R*(1+flash*0.12),silent?null:RCOL(sp.c),PAL.ink,5);
+  tx(x,silent?'rest':sp.lab,W/2,cy+R*0.18,{f:`900 ${Math.round(R*0.62)}px Archivo`,st:'condensed',al:'center',c:silent?PAL.ink3:RTXT(sp.c)});
+  if(RG.run&&RG.mode==='perform'){const st=ringStepMs(RG.run);let nxt=null;RG.run.hits.forEach(h=>{if(h.tp>=now-40&&(nxt==null||h.tp<nxt.tp))nxt=h;});
+    if(nxt){const lead=nxt.tp-now;if(lead<st*2.2){const k=clamp(lead/(st*2.2),0,1);dot(x,W/2,cy,R*(1+k*0.9),null,PAL.ink,4);}}
+    if(RG.fb&&now-RG.fb.t<900)tx(x,RG.fb.txt.toUpperCase(),W/2,cy+R+46,{f:'900 28px Archivo',st:'condensed',al:'center',c:RG.fb.c});
+    else tx(x,'TAP ANYWHERE WHEN THE RING CLOSES',W/2,cy+R+40,{f:'700 11px "Space Mono"',al:'center',c:PAL.ink2});}
+  else if(RG.run)tx(x,'LISTEN · THE BEAT TRAVELS AROUND THE ROOM',W/2,cy+R+40,{f:'700 11px "Space Mono"',al:'center',c:PAL.ink2});
+  const n=cfg.n,mcy=H*0.82,mr=Math.min(W*0.36,H*0.12),st=RG.run?ringStepMs(RG.run):1,pos=RG.run&&now>=RG.run.start?(now-RG.run.start)/st:null;
+  dot(x,W/2,mcy,mr,null,PAL.hair,2);
+  for(let i=0;i<n;i++){const a=-Math.PI/2+TAU*i/n,X=W/2+Math.cos(a)*mr,Y=mcy+Math.sin(a)*mr,s2=cfg.steps[i],own=mine.includes(i),b=Math.min(11,Math.PI*mr/n*0.45);
+    if(s2.s==='off')dot(x,X,Y,b*0.4,PAL.ink3);else dot(x,X,Y,b,RCOL(s2.c),PAL.ink,2);if(own)dot(x,X,Y,b+5,null,PAL.ink,2.5);}
+  if(pos!=null){const a=-Math.PI/2+TAU*((pos%n)/n);dot(x,W/2+Math.cos(a)*(mr-18),mcy+Math.sin(a)*(mr-18),5,PAL.ink);}
+  tx(x,'YOU',W/2,mcy+4,{f:'700 10px "Space Mono"',al:'center',c:PAL.ink2});
+}
+setInterval(()=>{if(RING.run)ringRun(RING.run);if(RG.run&&RG.unlocked)ringRun(RG.run);},25);
+function ringFrame(){if(RING.open)drawRingHost();if(!$('#ringv').hidden)drawRingGuest();}
 
 /* state in the link */
 const SAVE_IDS=['sc','ad','pr','pm','eu','sw'];
@@ -2126,6 +2343,7 @@ function frame(){
   if(st&&st.w>0){const scene=cur==='qz'?SCENES[arc.scene]:st.scene;const I={ph,cyc,D:S.playing?S.D:Math.max(0.05,modes[cur].duration()),T,playing:S.playing,tap:cur==='qz'?null:TP.target};
     st.ctx.clearRect(0,0,st.w,st.h);try{scene(st.ctx,st.w,st.h,I,st.params());}catch(err){console.error(err);}}
   if(modes[cur].frame)modes[cur].frame(ph);
+  ringFrame();
   requestAnimationFrame(frame);
 }
 
