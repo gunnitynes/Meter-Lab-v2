@@ -445,6 +445,12 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
   .arena .stage{height:300px!important}
 }
 
+/* ---------- join bar (QR links) ---------- */
+.joinbar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:12px;background:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:8px 8px 8px 16px;font:700 11px var(--mono);text-transform:uppercase;max-width:calc(100vw - 24px)}
+.joinbar b{font:900 24px/1 var(--disp);font-stretch:62%;color:var(--red);letter-spacing:.06em;margin-left:6px;vertical-align:-3px}
+.joinbar .big{padding:9px 14px}
+.jbx{border:2px solid var(--ink);background:var(--paper);width:34px;height:34px;font:700 16px var(--mono);padding:0}
+@media (max-width:760px){.joinbar{bottom:calc(84px + env(safe-area-inset-bottom));width:calc(100vw - 24px);justify-content:space-between}}
 /* ---------- MIDI out + classroom room panel ---------- */
 .mled{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink);margin-right:6px;vertical-align:0}
 .mled.on{background:var(--green);border-color:var(--green)}
@@ -2397,7 +2403,11 @@ function openLive(){const P=$('#mpanel');P.hidden=false;renderLive();const sh=$(
 function closeLive(){$('#mpanel').hidden=true;}
 $('#liveB').onclick=()=>{const P=$('#mpanel');if(P.hidden)openLive();else closeLive();};
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const ov=$('#qrbig');if(ov&&!ov.hidden){ov.hidden=true;return;}if(!$('#mpanel').hidden)closeLive();});
-{const rp=new URLSearchParams(location.search).get('room');if(rp){ROOM.join=rp.toUpperCase().slice(0,4);setTimeout(openLive,300);}}
+/* a QR / join link opens the normal start screen with a small "join this room" bar; the room code leaves the address bar */
+{const rp=new URLSearchParams(location.search).get('room');if(rp){ROOM.join=rp.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+  try{history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
+  const bar=el('div','joinbar',`<span>Classroom room <b>${ROOM.join}</b></span><button class="big go" type="button" id="jbGo">Join →</button><button class="jbx" type="button" id="jbX" aria-label="Dismiss">×</button>`);bar.setAttribute('role','status');document.body.appendChild(bar);
+  $('#jbGo').onclick=()=>{bar.remove();openLive();setTimeout(()=>{const n=$('#rName');if(n&&!n.value)n.focus();},60);};$('#jbX').onclick=()=>bar.remove();}}
 
 
 /* ====================================================================
