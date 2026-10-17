@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Meter Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 [hidden]{display:none!important}
 body{background:var(--paper);color:var(--ink);font:400 15px/1.5 var(--disp);-webkit-font-smoothing:antialiased}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:300;opacity:.32;mix-blend-mode:multiply;
@@ -398,6 +399,7 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
   .lvls{grid-template-columns:minmax(0,1fr)}
   .opts{grid-template-columns:minmax(0,1fr)}
 }
+@media (max-width:760px){input,select,textarea{font-size:16px!important}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- phone layout: slim top, thumb-reach transport at the bottom ---------- */
@@ -607,6 +609,9 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
    UTILITIES
    ==================================================================== */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+/* keep the screen at a fixed zoom on phones: iOS ignores user-scalable=no, so block pinch gestures too (touch-action: manipulation stops double-tap zoom) */
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
 const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
 const gcd=(a,b)=>b?gcd(b,a%b):a, lcm=(a,b)=>a/gcd(a,b)*b, lcmAll=a=>a.reduce((x,y)=>lcm(x,y),1);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), fmt1=v=>String(+(+v).toFixed(1));
