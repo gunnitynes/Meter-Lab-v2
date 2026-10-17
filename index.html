@@ -438,6 +438,46 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
   .pop{top:12px;font-size:26px}
   .arena .stage{height:300px!important}
 }
+
+/* ---------- MIDI out + classroom room panel ---------- */
+.mled{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink);margin-right:6px;vertical-align:0}
+.mled.on{background:var(--green);border-color:var(--green)}
+.mled.room{background:var(--blue);border-color:var(--blue)}
+.mled.hit{background:var(--red);border-color:var(--red)}
+.mpanel{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);z-index:90;background:var(--paper);border-left:3px solid var(--ink);box-shadow:-10px 0 0 rgba(0,0,0,.08);overflow-y:auto;display:flex;flex-direction:column}
+.mpanel[hidden]{display:none}
+.mp-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);padding:12px 14px}
+.mp-head h2{flex:1;font:900 18px/1 var(--disp);font-stretch:112%;text-transform:uppercase}
+.mp-head button{border:2px solid var(--paper);background:none;color:var(--paper);width:32px;height:32px;font:700 16px var(--mono)}
+.mp-sec{padding:14px 16px 16px;border-bottom:3px solid var(--ink);display:grid;gap:10px}
+.mp-sec h3{display:flex;gap:10px;align-items:baseline;font:900 16px var(--disp);text-transform:uppercase}
+.mp-sec h3 b{font:900 22px var(--disp);font-stretch:62%;color:var(--red)}
+.mp-sec p{font-size:13.5px;line-height:1.5;color:var(--ink2)}
+.mp-st{font:700 11px var(--mono);text-transform:uppercase;padding:8px 10px;border:2px solid var(--ink);display:flex;gap:8px;align-items:center}
+.mp-st.ok{background:color-mix(in srgb,var(--green) 18%,var(--paper))}
+.mp-st.warn{background:color-mix(in srgb,var(--yel) 30%,var(--paper))}
+.mp-st.err{background:color-mix(in srgb,var(--red) 18%,var(--paper))}
+.mp-row{display:grid;gap:5px}
+.mp-row > .lab{color:var(--ink2)}
+.mpanel select,.mpanel input[type=text]{font:700 13px var(--mono);border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:8px 10px;width:100%}
+.mp-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mp-help summary{cursor:pointer;font:700 11px var(--mono);text-transform:uppercase}
+.mp-help ol{margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.5;color:var(--ink2);display:grid;gap:6px}
+.mp-fine{font:400 11px/1.5 var(--mono)!important}
+.code{display:flex;align-items:center;gap:14px}
+.code b{font:900 56px/0.9 var(--disp);font-stretch:62%;letter-spacing:.06em;color:var(--red)}
+.code span{font:400 12px/1.4 var(--mono);color:var(--ink2);word-break:break-all}
+.qr{width:150px;height:150px;padding:8px;background:#fff;border:3px solid var(--ink)}
+.qr img,.qr canvas{width:100%!important;height:100%!important;display:block}
+.roster{display:grid;gap:4px}
+.rs{display:grid;grid-template-columns:14px minmax(0,1fr) auto auto auto;gap:8px;align-items:center;border:2px solid var(--ink);padding:6px 8px;font:700 11px var(--mono);text-transform:uppercase}
+.rs i{width:10px;height:10px;border-radius:50%;background:var(--hair)}
+.rs i.hit{background:var(--red)}
+.rs span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs em{font-style:normal;color:var(--ink2)}
+.rs button{font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--paper);padding:3px 6px}
+.rs button[aria-pressed=true]{background:var(--red);color:#fff;border-color:var(--red)}
+@media (max-width:760px){.mpanel{border-left:0;padding-bottom:calc(80px + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body>
@@ -466,12 +506,13 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 </header>
 <div class="util">
   <div class="utitle"><b id="uNum">01</b><h1 id="uTitle">Two in a beat, or three?</h1><span id="uLede"></span><button class="uq" id="uQuiz" type="button">Quiz me →</button></div>
-  <div class="grp"><button class="ub" id="midi" type="button" title="Download this loop as MIDI (GM drums, channel 10)">Export MIDI ↓</button><button class="ub" id="theme" type="button">Night</button></div>
+  <div class="grp"><button class="ub" id="liveB" type="button" title="Send MIDI live to a DAW, or join a classroom room"><i class="mled" id="mled"></i>MIDI out · Room</button><button class="ub" id="midi" type="button" title="Download this loop as MIDI (GM drums, channel 10)">Export MIDI ↓</button><button class="ub" id="theme" type="button">Night</button></div>
   <div class="grp"><span>Out</span><div class="leds" id="leds" aria-hidden="true"></div></div>
 </div>
 
 <main id="main"></main>
-<div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="midi">Export MIDI ↓</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
+<div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="liveB">MIDI out · Room</button><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="midi">Export MIDI ↓</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
+<div class="mpanel" id="mpanel" hidden role="dialog" aria-modal="false" aria-labelledby="mpTitle"></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -565,9 +606,10 @@ function tick(){
     let skip=!!(ev.layer&&mu[ev.layer]);
     if(take.state==='armed'&&ev.layer===take.layer&&t>=take.demoEnd-0.002&&t<take.end-0.002)skip=true;
     if(ev.guide&&cur==='qz'&&!arc.click)skip=true;
-    if(!skip){let tt=t,e=ev;if(ev.hum)tt+=(Math.random()*2-1)*ev.hum;if(ev.vh)e=Object.assign({},ev,{g:ev.g*(1-Math.random()*ev.vh)});voice(e,Math.max(tt,AC.currentTime));}
+    if(!skip){let tt=t,e=ev;if(ev.hum)tt+=(Math.random()*2-1)*ev.hum;if(ev.vh)e=Object.assign({},ev,{g:ev.g*(1-Math.random()*ev.vh)});const at=Math.max(tt,AC.currentTime);if(!MIDI.mute)voice(e,at);midiEvent(e,at);}
     S.idx++;if(S.idx>=S.events.length){S.idx=0;S.cs+=S.D;}
   }
+  midiTick(ahead);
 }
 setInterval(tick,25);
 function setPlaying(on){
@@ -576,7 +618,8 @@ function setPlaying(on){
     if(G.countIn){const m=modes[cur];const ci=m.countIn?m.countIn():{n:4,beat:60/bpm()};const st=AC.currentTime+0.08;
       for(let i=0;i<ci.n;i++)voice({v:'click',down:i===0},st+i*ci.beat);
       S.cinStart=st;S.cinBeat=ci.beat;S.cinN=ci.n;S.t0=st+ci.n*ci.beat;S.cs=S.t0;S.idx=0;}else S.cinN=0;
-  }else{S.playing=false;$('#cinv').textContent='';if(take.state==='armed'){take.state='idle';arcRender();}}
+    roomAlignStart();midiStart();
+  }else{S.playing=false;$('#cinv').textContent='';if(take.state==='armed'){take.state='idle';arcRender();}midiStop();}
   const b=$('#play');b.setAttribute('aria-pressed',on);
 }
 $('#play').addEventListener('click',()=>setPlaying(!S.playing));
@@ -1783,14 +1826,15 @@ function moduleTap(ct){
   const p=$('#pop-'+cur);if(p){const a=Math.abs(ms);const pb=pctBeat(ms);p.textContent=pb<3?'Tight!':feel(ms);p.style.color=pb<3?PAL.blue:pb<8?PAL.ink:PAL.red;p.classList.remove('go');void p.offsetWidth;p.classList.add('go');}
 }
 function tapJ(ts){
-  ensureAudio();if(!(cur==='qz'&&!arc.click))voice({v:'wood',g:0.3,f:2600},AC.currentTime);
+  ensureAudio();if(!(cur==='qz'&&!arc.click)&&!MIDI.mute)voice({v:'wood',g:0.3,f:2600},AC.currentTime);
+  midiTap(ts);
   const ct=ctOf(ts);
   if(cur==='qz'){if(take.state==='armed')takeTap(ct);return;}
   moduleTap(ct);
 }
 
 /* tempo */
-function setBpm(v){v=clamp(Math.round(v),40,220);if(v===bpmV)return;bpmV=v;$('#bpmVal').textContent=v;
+function setBpm(v,src){v=clamp(Math.round(v),40,220);if(src!=='room'&&ROOM.role==='guest'&&ROOM.lock&&ROOM.hostTempo){if(v!==ROOM.hostTempo.bpm)toast('Tempo is locked to the room');v=ROOM.hostTempo.bpm;}if(v===bpmV)return;const old=bpmV;bpmV=v;$('#bpmVal').textContent=v;roomTempoChanged(old);
   if(take.state==='armed'){take.state='idle';toast('Tempo changed: take cancelled');arcRender();}
   tempoHooks.forEach(f=>f());resync(true);}
 $('#bpmDn').onclick=()=>setBpm(bpmV-1);$('#bpmUp').onclick=()=>setBpm(bpmV+1);
@@ -1842,6 +1886,202 @@ function exportMidi(){
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(`MIDI saved · ${reps} cycle${reps>1?'s':''} · ${nn}/${dd} · GM drums ch 10`);
 }
 $('#midi').onclick=exportMidi;
+
+
+/* ====================================================================
+   LIVE MIDI OUT + CLASSROOM ROOM
+   Web MIDI sends the loop, a MIDI clock and taps to any port (IAC bus,
+   Apple Network MIDI, loopMIDI, rtpMIDI). A "room" links browsers peer
+   to peer (PeerJS only introduces them); guests stream their notes to
+   the host, who forwards them into the DAW, one MIDI channel per guest,
+   and everyone's tempo and bar lines lock to the host.
+   ==================================================================== */
+const MIDI={access:null,out:null,outName:store.get('midiOut',''),notes:store.get('midiNotes',true),map:store.get('midiMap','drums'),clock:store.get('midiClock',false),taps:store.get('midiTaps',true),mute:false,offset:store.get('midiOff',0),nextClock:0,clockRun:false,err:'',lastHit:0};
+const ROOM={role:null,peer:null,code:'',conns:new Map(),host:null,name:store.get('roomName',''),join:'',lock:true,buffer:store.get('roomBuf',40),offset:0,rtt:0,samples:[],anchor:0,hostTempo:null,ch:null,status:'',q:[],pingT:0,tempoT:0};
+const CODE_ABC='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const rawPerf=t=>{try{const o=AC.getOutputTimestamp();if(o.performanceTime>0&&o.contextTime>0)return o.performanceTime+(t-o.contextTime)*1000;}catch(e){}return performance.now()+(t-AC.currentTime+(AC.outputLatency||0))*1000;};
+const perfToCtx=p=>{try{const o=AC.getOutputTimestamp();if(o.performanceTime>0&&o.contextTime>0)return o.contextTime+(p-o.performanceTime)/1000;}catch(e){}return AC.currentTime+(p-performance.now())/1000-(AC.outputLatency||0);};
+const LAYER_CH={A:0,B:1,C:2,K:3,S:4,H:5,O:6,T:7};
+const f2m=f=>clamp(Math.round(69+12*Math.log2(f/440)),0,127);
+const TAP_NOTE=39; // GM hand clap
+function evToMidi(ev){
+  const vel=clamp(Math.round(ev.g*127),1,127);
+  if(MIDI.map==='drums'){const n=GM[ev.v];return n?[0x99,n,vel]:null;}
+  const ch=LAYER_CH[ev.layer];if(ch==null)return null;const n=ev.f?f2m(ev.f):GM[ev.v];return n?[0x90|ch,n,vel]:null;
+}
+function portSend(msg,perf){if(!MIDI.out)return;try{MIDI.out.send(msg,Math.max(performance.now(),perf+MIDI.offset));}catch(e){}}
+function noteOut(m,perf){
+  if(MIDI.out){portSend(m,perf);portSend([0x80|(m[0]&15),m[1],0],perf+70);}
+  if(ROOM.role==='guest')ROOM.q.push([Math.round(perf-performance.now()),m[0],m[1],m[2]]);
+  MIDI.lastHit=performance.now();
+}
+const midiLive=()=>!!MIDI.out||ROOM.role==='guest';
+function midiEvent(ev,at){if(!MIDI.notes||!midiLive()||ev.layer==='M'||cur==='qz')return;const m=evToMidi(ev);if(m)noteOut(m,rawPerf(at));}
+function midiTap(ts){if(!MIDI.taps||!midiLive())return;noteOut([MIDI.map==='drums'?0x99:0x9F,TAP_NOTE,110],ts);if(ROOM.role==='guest')roomFlush();}
+function midiStart(){if(!MIDI.clock||!MIDI.out||!S.playing)return;portSend([0xFA],rawPerf(S.t0));MIDI.nextClock=S.t0;MIDI.clockRun=true;}
+function midiStop(){if(MIDI.clockRun){portSend([0xFC],performance.now());MIDI.clockRun=false;}}
+function midiTick(ahead){
+  if(MIDI.clockRun&&MIDI.out){const step=60/(Math.max(20,modes[cur].qpm())*24);let g=0;
+    while(MIDI.nextClock<ahead&&g++<400){if(MIDI.nextClock>=AC.currentTime-0.03)portSend([0xF8],rawPerf(MIDI.nextClock));MIDI.nextClock+=step;}}
+  roomFlush();
+}
+async function midiEnable(){
+  if(!navigator.requestMIDIAccess){MIDI.err='none';renderLive();return;}
+  try{MIDI.access=await navigator.requestMIDIAccess({sysex:false});MIDI.err='';MIDI.access.onstatechange=()=>{pickPort();renderLive();};pickPort();}
+  catch(e){MIDI.err='denied';}
+  renderLive();
+}
+function midiPorts(){return MIDI.access?[...MIDI.access.outputs.values()]:[];}
+function pickPort(name){
+  if(name!=null){MIDI.outName=name;store.set('midiOut',name);}
+  const ps=midiPorts();MIDI.out=ps.find(p=>p.name===MIDI.outName)||null;
+  if(!MIDI.out&&MIDI.outName===''&&ps.length===1){MIDI.out=ps[0];MIDI.outName=ps[0].name;}
+  if(!MIDI.out)midiStop();else if(S.playing&&MIDI.clock&&!MIDI.clockRun){MIDI.nextClock=AC.currentTime+0.05;MIDI.clockRun=true;portSend([0xFA],rawPerf(MIDI.nextClock));}
+  ledSync();
+}
+
+/* ---------- room transport ---------- */
+function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=res;sc.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(sc);});}
+async function needPeer(){if(!window.Peer)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js');}
+async function needQR(){if(!window.QRCode)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');}
+const newCode=()=>[...Array(4)].map(()=>CODE_ABC[Math.floor(Math.random()*CODE_ABC.length)]).join('');
+const peerId=c=>'meterlab-v2-'+c.toLowerCase();
+const joinURL=()=>location.origin+location.pathname+'?room='+ROOM.code;
+function roomStatus(t){ROOM.status=t;renderLive();}
+async function hostRoom(){
+  roomLeave(true);ROOM.role='host';roomStatus('Opening a room…');
+  try{await needPeer();}catch(e){ROOM.role=null;roomStatus('Could not reach the room service. Check the internet connection.');return;}
+  const tryOpen=(left)=>{ROOM.code=newCode();const peer=new Peer(peerId(ROOM.code),{debug:0});ROOM.peer=peer;
+    peer.on('open',()=>{ROOM.anchor=performance.now();roomStatus('');ledSync();});
+    peer.on('error',e=>{if(e.type==='unavailable-id'&&left>0){peer.destroy();tryOpen(left-1);return;}roomStatus('Room problem: '+(e.type||e.message));});
+    peer.on('disconnected',()=>{try{peer.reconnect();}catch(e){}});
+    peer.on('connection',conn=>{
+      conn.on('open',()=>{const used=new Set([...ROOM.conns.values()].map(c=>c.ch));let ch=1;while((used.has(ch)||ch===10)&&ch<16)ch++;
+        ROOM.conns.set(conn.peer,{conn,ch,name:'Guest',muted:false,last:0});conn.send({t:'welcome',ch,bpm:bpmV,anchor:ROOM.anchor});renderLive();});
+      conn.on('data',m=>hostData(conn,m));
+      conn.on('close',()=>{ROOM.conns.delete(conn.peer);renderLive();});
+      conn.on('error',()=>{ROOM.conns.delete(conn.peer);renderLive();});});};
+  tryOpen(4);
+}
+function hostData(conn,m){
+  const st=ROOM.conns.get(conn.peer);if(!st||!m||typeof m!=='object')return;
+  if(m.t==='hi'){st.name=String(m.name||'Guest').slice(0,24);renderLive();}
+  else if(m.t==='ping'){conn.send({t:'pong',a:m.a,b:performance.now()});}
+  else if(m.t==='ev'&&Array.isArray(m.d)){
+    st.last=performance.now();if(st.muted)return;const now=performance.now(),lat=clamp(+m.l||0,0,400),ch=st.ch-1;
+    m.d.slice(0,200).forEach(e=>{if(!Array.isArray(e))return;const [lead,sb,n,v]=e;let when=now+(+lead||0)-lat+ROOM.buffer;if(when<now)when=now;
+      const note=(n|0)&127,vel=clamp(v|0,1,127),on=0x90|ch;portSend([on,note,vel],when-MIDI.offset);portSend([0x80|ch,note,0],when-MIDI.offset+70);void sb;});
+    flashGuest(conn.peer);}
+}
+function roomBroadcast(){if(ROOM.role!=='host')return;const msg={t:'tempo',bpm:bpmV,anchor:ROOM.anchor};ROOM.conns.forEach(c=>{try{c.conn.send(msg);}catch(e){}});}
+async function joinRoom(code){
+  code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(code.length!==4){roomStatus('Room codes have 4 characters.');return;}
+  roomLeave(true);ROOM.role='guest';ROOM.code=code;roomStatus('Connecting to '+code+'…');
+  try{await needPeer();}catch(e){ROOM.role=null;roomStatus('Could not reach the room service. Check the internet connection.');return;}
+  const peer=new Peer({debug:0});ROOM.peer=peer;
+  peer.on('open',()=>{const conn=peer.connect(peerId(code),{serialization:'json',reliable:true});ROOM.host=conn;
+    const fail=setTimeout(()=>{if(!conn.open){roomStatus('No room '+code+' found. Check the code with your teacher.');}},9000);
+    conn.on('open',()=>{clearTimeout(fail);conn.send({t:'hi',name:ROOM.name||'Student'});ROOM.samples=[];for(let i=0;i<5;i++)setTimeout(()=>roomPing(),i*150);roomStatus('');});
+    conn.on('data',m=>guestData(m));
+    conn.on('close',()=>{if(ROOM.role==='guest'){roomStatus('The room closed.');ROOM.host=null;ROOM.hostTempo=null;ledSync();}});});
+  peer.on('error',e=>{roomStatus(e.type==='peer-unavailable'?'No room '+code+' found. Check the code with your teacher.':'Room problem: '+(e.type||e.message));});
+}
+function guestData(m){
+  if(!m||typeof m!=='object')return;
+  if(m.t==='welcome'){ROOM.ch=m.ch;ROOM.hostTempo={bpm:m.bpm,anchor:m.anchor};if(ROOM.lock)setBpm(m.bpm,'room');renderLive();ledSync();}
+  else if(m.t==='tempo'){ROOM.hostTempo={bpm:m.bpm,anchor:m.anchor};if(ROOM.lock&&bpmV!==m.bpm)setBpm(m.bpm,'room');}
+  else if(m.t==='pong'){const c=performance.now(),rtt=c-m.a;ROOM.samples.push({rtt,off:m.b-(m.a+c)/2});if(ROOM.samples.length>10)ROOM.samples.shift();
+    const best=ROOM.samples.reduce((a,b)=>b.rtt<a.rtt?b:a);ROOM.offset=best.off;ROOM.rtt=best.rtt;renderLiveStats();}
+}
+function roomPing(){if(ROOM.role==='guest'&&ROOM.host&&ROOM.host.open)ROOM.host.send({t:'ping',a:performance.now()});}
+function roomFlush(){if(ROOM.role!=='guest'||!ROOM.q.length)return;if(ROOM.host&&ROOM.host.open){try{ROOM.host.send({t:'ev',l:Math.round(ROOM.rtt/2),d:ROOM.q});}catch(e){}}ROOM.q=[];}
+function roomLeave(quiet){try{if(ROOM.peer)ROOM.peer.destroy();}catch(e){}ROOM.peer=null;ROOM.host=null;ROOM.conns.clear();ROOM.role=null;ROOM.code='';ROOM.ch=null;ROOM.hostTempo=null;ROOM.q=[];ROOM.samples=[];if(!quiet)roomStatus('');ledSync();}
+setInterval(()=>{const now=performance.now();if(ROOM.role==='guest'&&now-ROOM.pingT>2000){ROOM.pingT=now;roomPing();}if(ROOM.role==='host'&&now-ROOM.tempoT>1000){ROOM.tempoT=now;roomBroadcast();}},250);
+/* shared bar grid: every play press starts on the next room downbeat */
+function roomGrid(){
+  if(ROOM.role==='host'&&ROOM.peer)return {a:ROOM.anchor,bar:4*60000/bpmV};
+  if(ROOM.role==='guest'&&ROOM.lock&&ROOM.hostTempo&&ROOM.samples.length)return {a:ROOM.hostTempo.anchor-ROOM.offset,bar:4*60000/ROOM.hostTempo.bpm};
+  return null;
+}
+function roomAlignStart(){
+  const gr=roomGrid();if(!gr||!S.playing)return;const k=Math.ceil((performance.now()+180-gr.a)/gr.bar),Ts=gr.a+k*gr.bar,t=perfToCtx(Ts);
+  if(t>AC.currentTime){S.t0=t;S.cs=t;S.idx=0;S.cinN=0;}
+}
+function roomTempoChanged(oldBpm){
+  if(ROOM.role!=='host')return;const now=performance.now(),ob=4*60000/oldBpm,ph=(((now-ROOM.anchor)/ob)%1+1)%1;ROOM.anchor=now-ph*(4*60000/bpmV);roomBroadcast();
+}
+function flashGuest(id){const e=document.querySelector(`.rs[data-id="${CSS.escape(id)}"] i`);if(e){e.classList.add('hit');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('hit'),110);}ledHit();}
+function ledHit(){const l=$('#mled');if(!l)return;l.classList.add('hit');clearTimeout(l._t);l._t=setTimeout(()=>l.classList.remove('hit'),90);}
+function ledSync(){const l=$('#mled');if(!l)return;l.classList.toggle('on',!!MIDI.out);l.classList.toggle('room',!MIDI.out&&!!ROOM.role);}
+setInterval(()=>{if(MIDI.lastHit&&performance.now()-MIDI.lastHit<60)ledHit();},50);
+
+/* ---------- panel ---------- */
+function renderLiveStats(){const s=$('#roomStats');if(s&&ROOM.role==='guest')s.textContent=ROOM.samples.length?`Connection ${Math.round(ROOM.rtt)} ms round trip · clock locked`:'Measuring the connection…';}
+function renderLive(){
+  const P=$('#mpanel');if(!P||P.hidden)return;const keep=document.activeElement&&P.contains(document.activeElement)?document.activeElement.id:null;
+  const ps=midiPorts(),noMidi=!navigator.requestMIDIAccess;
+  let st,cls;
+  if(noMidi||MIDI.err==='none'){st='This browser has no Web MIDI (Safari, iPhone, iPad). Use Chrome or Edge, or join a room below.';cls='warn';}
+  else if(MIDI.err==='denied'){st='MIDI access was blocked. Allow it in the browser’s site settings, then try again.';cls='err';}
+  else if(!MIDI.access){st='Off';cls='';}
+  else if(!ps.length){st='No MIDI outputs found. Set one up with the steps below.';cls='warn';}
+  else if(!MIDI.out){st='Pick an output';cls='warn';}
+  else{st='Sending to '+MIDI.out.name;cls='ok';}
+  let h=`<div class="mp-head"><h2 id="mpTitle">MIDI out · Room</h2><button type="button" id="mpClose" aria-label="Close">×</button></div>`;
+  h+=`<section class="mp-sec"><h3><b>01</b>This device → MIDI</h3><p>Send the loop, a MIDI clock and your taps live into a DAW: on this computer, or to another computer over Wi-Fi.</p><div class="mp-st ${cls}"><i class="mled ${MIDI.out?'on':''}"></i>${st}</div>`;
+  if(!noMidi&&!MIDI.access)h+=`<button class="big pri" type="button" id="mEnable">Turn on MIDI out</button>`;
+  if(MIDI.access){
+    h+=`<div class="mp-row"><span class="lab">Output port</span><select id="mOut"><option value="">— none —</option>${ps.map(p=>`<option ${MIDI.out&&MIDI.out.id===p.id?'selected':''}>${p.name.replace(/</g,'&lt;')}</option>`).join('')}</select></div>`;
+    h+=`<div class="mp-row"><span class="lab">Notes are mapped as</span><div id="mMap"></div></div><div class="mp-row"><span class="lab">Send</span><div id="mSend"></div></div>`;
+    h+=`<div class="mp-row" id="mOffRow"></div><div class="acts"><button class="big" type="button" id="mTest">Send test note</button></div>`;
+  }
+  h+=`<details class="mp-help"><summary>How to connect a DAW</summary><ol>
+    <li><b>Ableton on this Mac:</b> open Audio MIDI Setup → Window → Show MIDI Studio → double-click <b>IAC Driver</b> → tick “Device is online”. Pick “IAC Driver Bus 1” above.</li>
+    <li><b>In Ableton:</b> Settings → Link, Tempo &amp; MIDI → turn on <b>Track</b> for the IAC input (and <b>Sync</b> if you send the clock, then switch Ableton’s tempo to EXT). Arm a MIDI track with input “All Ins”.</li>
+    <li><b>Another Mac over Wi-Fi:</b> Audio MIDI Setup → MIDI Studio → Network. Create a session on both Macs and connect them. The session appears above as an output.</li>
+    <li><b>Windows:</b> loopMIDI makes a virtual port on the same PC; rtpMIDI joins Apple network sessions over Wi-Fi.</li></ol></details></section>`;
+  h+=`<section class="mp-sec"><h3><b>02</b>Classroom room</h3>`;
+  if(!ROOM.role){
+    h+=`<p>The teacher hosts a room on the computer that runs the DAW. Students join with the code, from any device, phones included. Everyone’s notes and taps arrive in the DAW on their own MIDI channel, and everyone’s tempo and bar lines lock to the host.</p>
+      <div class="acts"><button class="big pri" type="button" id="rHost">Host a room</button></div>
+      <div class="mp-row"><span class="lab">Or join one</span><div class="mp-two"><input type="text" id="rName" placeholder="Your name" maxlength="24" value="${(ROOM.name||'').replace(/"/g,'&quot;')}"><input type="text" id="rCode" placeholder="Code" maxlength="4" autocapitalize="characters" value="${ROOM.join}"></div></div>
+      <div class="acts"><button class="big" type="button" id="rJoin">Join room →</button></div>`;
+  }else if(ROOM.role==='host'){
+    h+=ROOM.peer&&ROOM.peer.open?`<div class="code"><div class="qr" id="rQR" aria-label="QR code for the join link"></div><div><b>${ROOM.code}</b><span>Students scan the code, or open<br>${joinURL()}</span></div></div>`:'';
+    h+=`<div class="mp-st ${MIDI.out?'ok':'warn'}"><i class="mled ${MIDI.out?'on':''}"></i>${MIDI.out?'Forwarding guests to '+MIDI.out.name:'Pick an output port above so guests reach your DAW'}</div>`;
+    h+=`<div class="mp-row"><span class="lab">${ROOM.conns.size} guest${ROOM.conns.size===1?'':'s'} connected</span><div class="roster">${[...ROOM.conns.entries()].map(([id,c])=>`<div class="rs" data-id="${id}"><i></i><span>${c.name.replace(/</g,'&lt;')}</span><em>ch ${c.ch}</em><button type="button" data-mute="${id}" aria-pressed="${c.muted}">${c.muted?'Muted':'Mute'}</button><button type="button" data-kick="${id}">×</button></div>`).join('')||'<p class="mp-fine">Waiting for students…</p>'}</div></div>`;
+    h+=`<div class="mp-row" id="rBufRow"></div><div class="acts"><button class="big" type="button" id="rLeave">Close room</button></div>`;
+  }else{
+    h+=`<div class="mp-st ${ROOM.host&&ROOM.host.open?'ok':'warn'}"><i class="mled ${ROOM.host&&ROOM.host.open?'room':''}"></i>${ROOM.host&&ROOM.host.open?`In room ${ROOM.code}${ROOM.ch?` · you are MIDI channel ${ROOM.ch}`:''}`:'Connecting to '+ROOM.code+'…'}</div><p class="mp-fine" id="roomStats"></p>`;
+    h+=`<div class="mp-row"><span class="lab">Send to the room</span><div id="rSend"></div></div><div class="acts"><button class="big" type="button" id="rLeave">Leave room</button></div>`;
+  }
+  if(ROOM.status)h+=`<p class="mp-st warn">${ROOM.status}</p>`;
+  h+=`<p class="mp-fine">Devices find each other through the free PeerJS service; the notes then travel directly between devices. Works best when everyone is on the same Wi-Fi.</p></section>`;
+  P.innerHTML=h;
+  $('#mpClose').onclick=closeLive;
+  const en=$('#mEnable');if(en)en.onclick=()=>{ensureAudio();midiEnable();};
+  const so=$('#mOut');if(so)so.onchange=()=>{pickPort(so.value);renderLive();};
+  if($('#mMap'))seg($('#mMap'),[{k:'drums',label:'Drums · ch 10 (GM)'},{k:'layers',label:'Layers · ch 1–8'}],it=>MIDI.map===it.k,it=>{MIDI.map=it.k;store.set('midiMap',it.k);});
+  const toggles=host=>seg(host,[{k:'notes',label:'Loop notes'},{k:'taps',label:'My taps'}].concat(host.id==='mSend'?[{k:'clock',label:'MIDI clock'},{k:'mute',label:'Mute app sound'}]:[{k:'mute',label:'Mute app sound'}]),it=>!!MIDI[it.k],it=>{MIDI[it.k]=!MIDI[it.k];if(it.k!=='mute')store.set('midi'+it.k[0].toUpperCase()+it.k.slice(1),MIDI[it.k]);if(it.k==='clock'){if(MIDI.clock&&S.playing&&MIDI.out&&!MIDI.clockRun){MIDI.nextClock=AC.currentTime+0.05;MIDI.clockRun=true;portSend([0xFA],rawPerf(MIDI.nextClock));}if(!MIDI.clock)midiStop();}});
+  if($('#mSend'))toggles($('#mSend'));if($('#rSend'))toggles($('#rSend'));
+  if($('#mOffRow'))slider($('#mOffRow'),{label:'Timing offset (if the DAW is early or late)',min:-120,max:120,step:5,value:MIDI.offset,def:0,fmt:v=>(v>0?'+':'')+v+' ms',onChange:v=>{MIDI.offset=v;store.set('midiOff',v);}});
+  if($('#rBufRow'))slider($('#rBufRow'),{label:'Room buffer (smooths Wi-Fi jitter)',min:0,max:150,step:5,value:ROOM.buffer,def:40,fmt:v=>v+' ms',onChange:v=>{ROOM.buffer=v;store.set('roomBuf',v);}});
+  const tst=$('#mTest');if(tst)tst.onclick=()=>{const n=MIDI.map==='drums'?[0x99,38,110]:[0x90,60,110];portSend(n,performance.now());portSend([0x80|(n[0]&15),n[1],0],performance.now()+200);toast(MIDI.out?'Test note sent':'Pick an output first');};
+  const hb=$('#rHost');if(hb)hb.onclick=()=>{ensureAudio();hostRoom();};
+  const nm=$('#rName');if(nm)nm.oninput=()=>{ROOM.name=nm.value;store.set('roomName',nm.value);};
+  const cd=$('#rCode');if(cd){cd.oninput=()=>{cd.value=cd.value.toUpperCase();ROOM.join=cd.value;};cd.onkeydown=e=>{if(e.key==='Enter')joinRoom(cd.value);};}
+  const jb=$('#rJoin');if(jb)jb.onclick=()=>{ensureAudio();joinRoom($('#rCode').value);};
+  const lv=$('#rLeave');if(lv)lv.onclick=()=>roomLeave();
+  P.querySelectorAll('[data-mute]').forEach(b=>b.onclick=()=>{const c=ROOM.conns.get(b.dataset.mute);if(c){c.muted=!c.muted;renderLive();}});
+  P.querySelectorAll('[data-kick]').forEach(b=>b.onclick=()=>{const c=ROOM.conns.get(b.dataset.kick);if(c){try{c.conn.close();}catch(e){}ROOM.conns.delete(b.dataset.kick);renderLive();}});
+  const qr=$('#rQR');if(qr){needQR().then(()=>{qr.innerHTML='';new QRCode(qr,{text:joinURL(),width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}).catch(()=>{qr.textContent=ROOM.code;});}
+  renderLiveStats();if(keep&&$('#'+keep))$('#'+keep).focus();
+}
+function openLive(){const P=$('#mpanel');P.hidden=false;renderLive();const sh=$('#sheet');if(sh)sh.hidden=true;}
+function closeLive(){$('#mpanel').hidden=true;}
+$('#liveB').onclick=()=>{const P=$('#mpanel');if(P.hidden)openLive();else closeLive();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#mpanel').hidden)closeLive();});
+{const rp=new URLSearchParams(location.search).get('room');if(rp){ROOM.join=rp.toUpperCase().slice(0,4);setTimeout(openLive,300);}}
 
 /* state in the link */
 const SAVE_IDS=['sc','ad','pr','pm','eu','sw'];
