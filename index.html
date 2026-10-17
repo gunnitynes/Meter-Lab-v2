@@ -514,12 +514,12 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 </header>
 <div class="util">
   <div class="utitle"><b id="uNum">01</b><h1 id="uTitle">Two in a beat, or three?</h1><button class="uq" id="uQuiz" type="button">Quiz me →</button></div>
-  <div class="grp"><button class="ub" id="liveB" type="button" title="Send MIDI live to a DAW, or join a classroom room"><i class="mled" id="mled"></i>MIDI out · Room</button><button class="ub" id="theme" type="button">Night</button></div>
+  <div class="grp"><button class="ub" id="liveB" type="button" title="Send MIDI live to a DAW, or join a classroom room"><i class="mled" id="mled"></i>MIDI out</button><button class="ub" id="theme" type="button">Night</button></div>
   <div class="grp"><span>Out</span><div class="leds" id="leds" aria-hidden="true"></div></div>
 </div>
 
 <main id="main"></main>
-<div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="liveB">MIDI out · Room</button><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
+<div class="sheet" id="sheet" hidden><button class="sb" type="button" data-proxy="liveB">MIDI out</button><button class="sb" type="button" data-proxy="cinB">Count-in</button><button class="sb" type="button" data-proxy="theme">Night</button></div>
 <div class="mpanel" id="mpanel" hidden role="dialog" aria-modal="false" aria-labelledby="mpTitle"></div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -2021,7 +2021,7 @@ function renderLive(){
   else if(!ps.length){st='No MIDI outputs found. Set one up with the steps below.';cls='warn';}
   else if(!MIDI.out){st='Pick an output';cls='warn';}
   else{st='Sending to '+MIDI.out.name;cls='ok';}
-  let h=`<div class="mp-head"><h2 id="mpTitle">MIDI out · Room</h2><button type="button" id="mpClose" aria-label="Close">×</button></div>`;
+  let h=`<div class="mp-head"><h2 id="mpTitle">MIDI out</h2><button type="button" id="mpClose" aria-label="Close">×</button></div>`;
   h+=`<section class="mp-sec"><h3><b>01</b>This device → MIDI</h3><p>Send the loop, a MIDI clock and your taps live into a DAW: on this computer, or to another computer over Wi-Fi.</p><div class="mp-st ${cls}"><i class="mled ${MIDI.out?'on':''}"></i>${st}</div>`;
   if(!noMidi&&!MIDI.access)h+=`<button class="big pri" type="button" id="mEnable">Turn on MIDI out</button>`;
   if(MIDI.access){
