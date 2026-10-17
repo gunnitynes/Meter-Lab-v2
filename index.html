@@ -1892,7 +1892,10 @@ function arcNext(){
   arc.screen='q';arc.scene='listen';arc.P={word:arc.q.kind==='play'?'PLAY':arc.q.kind==='build'?'BUILD':'LISTEN'};
   if(cur!=='qz')show('qz');arcRender();
   if(S.playing)resync(false);else setPlaying(true);
+  requestAnimationFrame(()=>scrollIntoViewTop(innerWidth<=960?$('#ap'):$('.arena')));
 }
+/* bring an element's top just under the sticky top bar (smooth, with an instant fallback) */
+function scrollIntoViewTop(elm){if(!elm)return;const y=Math.max(0,window.scrollY+elm.getBoundingClientRect().top-$('.top').offsetHeight-8);if(Math.abs(window.scrollY-y)<8)return;window.scrollTo({top:y,behavior:'smooth'});setTimeout(()=>{if(Math.abs(window.scrollY-y)>12)window.scrollTo({top:y,behavior:'auto'});},700);}
 const mult=()=>1+Math.min(arc.combo,8)*0.25;
 function attemptOk(base){arcResolve(true,Math.round(base*mult()/arc.tries));}
 function attemptMiss(msg,partialPts){
@@ -1984,7 +1987,7 @@ function arcRender(){
       sp.classList.add('wait');stg.appendChild(sp);
       const top=$('.top').offsetHeight,y=window.scrollY+stg.getBoundingClientRect().top-top-8;
       const go=()=>{if(!sp.isConnected||!sp.classList.contains('wait'))return;void sp.offsetWidth;sp.classList.remove('wait');};
-      if(Math.abs(window.scrollY-y)<8)go();else{window.scrollTo({top:Math.max(0,y),behavior:'smooth'});let done=false;const fin=()=>{if(done)return;done=true;window.removeEventListener('scrollend',fin);if(Math.abs(window.scrollY-Math.max(0,y))>12)window.scrollTo({top:Math.max(0,y),behavior:'auto'});setTimeout(go,80);};window.addEventListener('scrollend',fin);setTimeout(fin,700);}
+      if(Math.abs(window.scrollY-y)<8)go();else{window.scrollTo({top:Math.max(0,y),behavior:'smooth'});let done=false;const fin=()=>{if(done)return;done=true;window.removeEventListener('scrollend',fin);if(!sp.isConnected)return;if(Math.abs(window.scrollY-Math.max(0,y))>12)window.scrollTo({top:Math.max(0,y),behavior:'auto'});setTimeout(go,80);};window.addEventListener('scrollend',fin);setTimeout(fin,700);}
     }else stg.appendChild(sp);
     arc.fresh=false;
   }
