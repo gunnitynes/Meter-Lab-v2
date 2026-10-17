@@ -318,6 +318,8 @@ main{max-width:1440px;margin:0 auto;padding:14px 22px 90px}
 .stamp{position:absolute;top:22px;right:22px;z-index:4;width:150px;height:150px;border-radius:50%;border:8px solid var(--red);color:var(--red);display:grid;place-content:center;text-align:center;font:900 34px/0.9 var(--disp);font-stretch:62%;text-transform:uppercase;transform:rotate(-14deg);animation:stamp .4s cubic-bezier(.2,1.7,.4,1);background:color-mix(in srgb,var(--paper) 80%,transparent)}
 .stamp small{display:block;font:700 11px var(--mono);margin-top:6px}
 .stamp.ok{border-color:var(--blue);color:var(--blue)}
+.stamp.wait{opacity:0;animation:none}
+@media (max-width:960px){.stamp{right:auto;left:calc(50% - 75px);top:calc(50% - 75px)}}
 @keyframes stamp{from{transform:rotate(-14deg) scale(2.4);opacity:0}to{transform:rotate(-14deg) scale(1);opacity:1}}
 .fb{display:grid;gap:12px;border-top:3px solid var(--ink);padding-top:14px}
 .fb p{font-size:15px;line-height:1.55}
@@ -1907,7 +1909,7 @@ function arcResolve(ok,pts,partial){
   if(ok&&q.key){arc.doneSet.add(q.key+'@'+(q.level||arc.level));store.set('done',[...arc.doneSet]);}
   arc.scene=q.scene;arc.P=q.P;
   if(arc.aud!=='target'){arc.aud='target';resync(false);}
-  arc.stamp={ok,pts};arc.i++;
+  arc.stamp={ok,pts};arc.fresh=true;arc.i++;
   arcRender();navBadges();
 }
 function arcFinish(){
@@ -1977,7 +1979,14 @@ function arcRender(){
     fb.appendChild(el('p','',`${last.ok?(last.tries>1?`<b>Got it on attempt ${last.tries}.</b> `:'<b>Right first time.</b> '):'<b>Here is the answer.</b> '}${q.explain}${q.kind==='play'&&take.res?` You hit ${take.res.hits} of ${take.res.n}, on average ${feel(take.res.mean)}${take.res.extras?`, ${take.res.extras} extra tap${take.res.extras>1?'s':''}`:''}.`:''} The figure on the left now shows what played.`));
     const a=el('div','acts');const nx=el('button','big pri',arc.i>=arc.len?'See your grade →':'Next →');nx.innerHTML+='<small>N</small>';nx.type='button';nx.onclick=arcNext;
     const op=el('button','big','Open in lab');op.type='button';op.onclick=()=>q.open();a.append(nx,op);fb.appendChild(a);ap.appendChild(fb);
-    const sp=el('div','stamp'+(last.ok?' ok':''),`${last.ok?'Yes!':'Nope'}<small>+${last.pts}</small>`);$('#stage-qz').appendChild(sp);
+    const sp=el('div','stamp'+(last.ok?' ok':''),`${last.ok?'Yes!':'Nope'}<small>+${last.pts}</small>`);const stg=$('#stage-qz');
+    if(arc.fresh&&last.ok&&innerWidth<=960){ /* phone: bring the figure into view first, then stamp */
+      sp.classList.add('wait');stg.appendChild(sp);
+      const top=$('.top').offsetHeight,y=window.scrollY+stg.getBoundingClientRect().top-top-8;
+      const go=()=>{if(!sp.isConnected||!sp.classList.contains('wait'))return;void sp.offsetWidth;sp.classList.remove('wait');};
+      if(Math.abs(window.scrollY-y)<8)go();else{window.scrollTo({top:Math.max(0,y),behavior:'smooth'});let done=false;const fin=()=>{if(done)return;done=true;window.removeEventListener('scrollend',fin);if(Math.abs(window.scrollY-Math.max(0,y))>12)window.scrollTo({top:Math.max(0,y),behavior:'auto'});setTimeout(go,80);};window.addEventListener('scrollend',fin);setTimeout(fin,700);}
+    }else stg.appendChild(sp);
+    arc.fresh=false;
   }
 }
 function renderHear(ap,q){
