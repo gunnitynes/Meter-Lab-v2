@@ -254,6 +254,7 @@ main{max-width:1440px;margin:0 auto;padding:14px 22px 90px}
 .notes.chk{grid-template-areas:'idea idea' 'listen studio' 'checks checks'}
 .notes.full.noidea{grid-template-areas:'listen studio tracks' 'checks checks checks'}
 .notes.nostudio{grid-template-areas:'idea listen'}
+@media (max-width:900px){.notes.nostudio{grid-template-areas:'idea' 'listen'}.notes.full.noidea{grid-template-areas:'listen' 'studio' 'tracks' 'checks'}.notes.chk{grid-template-areas:'idea' 'listen' 'studio' 'checks'}}
 .n-listen{grid-area:listen}.n-studio{grid-area:studio}.n-tracks{grid-area:tracks}
 .notes > div{background:var(--paper);padding:18px 20px;display:grid;gap:10px;align-content:start}
 .notes h4{font:700 10.5px var(--mono);text-transform:uppercase;display:flex;gap:8px;align-items:center}
