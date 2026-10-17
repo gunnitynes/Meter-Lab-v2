@@ -80,7 +80,7 @@ p{margin:0}
 .utitle h1 span{display:inline;flex:none;font:inherit;color:inherit;white-space:inherit;overflow:visible}
 .utitle > span{flex:1 1 0;font:400 12px/1.3 var(--disp);text-transform:none;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .uq[hidden]{display:inline-block!important;visibility:hidden}
-.uq{flex:none;font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:4px 8px}
+.uq{flex:none;margin-left:auto;font:700 10px var(--mono);text-transform:uppercase;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:4px 8px}
 .uq:hover{background:var(--red);border-color:var(--red);color:#fff}
 @media (max-width:1180px){.utitle > span{display:none}}
 @media (max-width:760px){.util{flex-wrap:wrap;height:auto}.utitle{flex-basis:100%}.utitle > span{display:none}.utitle h1{white-space:normal;font-size:13px;flex:1 1 0}}
@@ -525,6 +525,13 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 .pad small{font:700 9px var(--mono);opacity:.8}
 .pad.off{opacity:.35}
 .pad.hit{transform:scale(.96);filter:brightness(1.25);box-shadow:0 0 0 3px var(--ink) inset}
+.stepnav{flex:none;display:flex;align-items:stretch;gap:0;border:3px solid var(--ink);height:54px}
+.sn{width:40px;border:0;background:var(--paper);font:700 16px var(--mono);padding:0}
+.sn:hover{background:var(--yel);color:#161514}
+.snx{border-left:2px solid var(--ink);color:var(--red)}
+.snl{min-width:64px;display:grid;place-content:center;text-align:center;border-left:2px solid var(--ink);border-right:2px solid var(--ink);font:700 10px var(--mono);text-transform:uppercase;line-height:1.1}
+.snl b{display:block;font:900 24px/1 var(--disp);font-stretch:62%;color:var(--red)}
+.pad.set{box-shadow:inset 0 0 0 4px var(--ink),inset 0 0 0 7px var(--yel)}
 .rec{flex:none;width:64px;height:54px;border:3px solid var(--ink);background:var(--paper);display:grid;place-content:center;gap:3px;font:700 10px var(--mono);text-transform:uppercase}
 .rec i{width:16px;height:16px;border-radius:50%;background:var(--red);margin:0 auto}
 .rec[aria-pressed="true"]{background:var(--red);color:#fff}
@@ -540,7 +547,7 @@ kbd{font:700 10px var(--mono);border:2px solid var(--ink);padding:0 5px;color:va
 .trk .ms[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .trk .ms.so[aria-pressed="true"]{background:var(--yel);color:#161514}
 .trks{display:grid;gap:4px}
-@media (max-width:760px){.pads{height:58px;padding:4px;gap:4px}.pad{height:48px;font-size:12px}.pad small{display:none}.rec{width:46px;height:48px}.work #stage-pg canvas{height:100%}}
+@media (max-width:760px){.stepnav{height:48px}.sn{width:30px}.snl{min-width:44px}.snl b{font-size:18px}.pads{height:58px;padding:4px;gap:4px}.pad{height:48px;font-size:12px}.pad small{display:none}.rec{width:46px;height:48px}.work #stage-pg canvas{height:100%}}
 </style>
 </head>
 <body>
@@ -1030,7 +1037,7 @@ pg:{obj:['Combine every idea from 01–07 in one groove','Hear how loop length, 
  idea:'Every track is one idea from the course: a <b>Steps</b> grid, a <b>Euclid</b> necklace, an additive <b>Groups</b> bar or a <b>Poly</b> cross-rhythm. Give tracks different lengths and you have a <b>polymeter</b>: the rings drift and line up again after the least common multiple.',
  listen:'Mute everything but two tracks and listen to how they lock or drift. Then solo one track, play the pads along with it, and turn on <b>REC</b> to keep what you play.',
  studio:'Turn on MIDI out in Layers mode and every track arrives on its own channel (1–6), ready for six instruments in your DAW. Scenes A–D work like clip launching: store a groove, change it, and switch back live.',
- checks:[['Make a 3:2 cross-rhythm.','Two Poly tracks over the same length: one with 3 hits, one with 2. Or start from the “3 against 2” template.'],['Turn a straight groove into a shuffle.','Raise Swing to about 66 %. Only the in-between 16ths move; the beats stay put.'],['Build a polymeter that realigns after 3 bars.','A 16-step track plus a 12-step (or 3-step) track: LCM(16,12) = 48 steps, three bars.'],['Make the tresillo two different ways.','A Euclid track E(3,8), or a Groups track 3+3+2. Both give x..x..x.'],['Record your own fill.','Turn on REC, press play and hit a pad: each hit snaps to the nearest step of that track.']]},
+ checks:[['Make a 3:2 cross-rhythm.','Two Poly tracks over the same length: one with 3 hits, one with 2. Or start from the “3 against 2” template.'],['Turn a straight groove into a shuffle.','Raise Swing to about 66 %. Only the in-between 16ths move; the beats stay put.'],['Build a polymeter that realigns after 3 bars.','A 16-step track plus a 12-step (or 3-step) track: LCM(16,12) = 48 steps, three bars.'],['Make the tresillo two different ways.','A Euclid track E(3,8), or a Groups track 3+3+2. Both give x..x..x.'],['Program a beat one division at a time.','Turn on REC: a yellow cursor sits on step 1 (beat 1). Tap the pads that should play there, then press ▶ (or the right arrow) for “e”, “&”, “a”, beat 2… ✕ clears a step.']]},
 qz:{obj:['Identify meters, groupings, ratios, patterns and swing by ear','Rebuild what you hear: program a grouping or a step pattern from memory','Perform it: supply a muted part in time, graded to the millisecond','Track accuracy per topic and climb three difficulty levels'],
  idea:'Three kinds of challenge, in rising order of difficulty:<br><b>Hear it</b>: name what plays.<br><b>Build it</b>: program what you heard, then compare yours with the original.<br><b>Play it</b>: one part drops out after the first cycle and you tap it in on the TAP pad (or J).',
  listen:'Find the downbeat first (the kick). Count what you would nod to. Only then listen to how each beat splits. For ratios, follow the high voice alone, then the low voice alone. Slow the tempo if you need to: it is allowed.',
@@ -1041,7 +1048,7 @@ qz:{obj:['Identify meters, groupings, ratios, patterns and swing by ear','Rebuil
    SHELLS
    ==================================================================== */
 const MODS=[
-  {id:'sc',n:'01',nav:'Simple / compound',kick:'Simple & compound meter',title:'Two in a beat, or three?',lede:'Same bar, same pulses. Watch where the ball lands: that is where your head nods.',fig:'The bounce',topic:'meter'},
+  {id:'sc',n:'01',nav:'Simple/compound',kick:'Simple & compound meter',title:'Two in a beat, or three?',lede:'Same bar, same pulses. Watch where the ball lands: that is where your head nods.',fig:'The bounce',topic:'meter'},
   {id:'ad',n:'02',nav:'Additive',kick:'Additive meters',title:'Long and short beats',lede:'Build a bar from 2s and 3s. Short beats are quick blue hops, long beats are tall red ones.',fig:'The hop',topic:'grouping'},
   {id:'pr',n:'03',nav:'Polyrhythm',kick:'Polyrhythm',title:'Same span, different counts',lede:'Each ball crosses its arc a different number of times per cycle. They strike the floor together only on the downbeat.',fig:'The arcs',topic:'poly'},
   {id:'pm',n:'04',nav:'Polymeter',kick:'Polymeter',title:'Same pulse, different loops',lede:'One tooth per step, every wheel turning at the same pace. Different sizes come round at different times, and line up after the LCM.',fig:'The wheels',topic:'polymeter'},
@@ -1484,7 +1491,7 @@ const PG_TEMPLATES=[
   {k:'samba',label:'Samba',sw:54,tracks:[pgT({sound:'kick',pat:patOf('1000000010000000')}),pgT({type:'euclid',sound:'rim',len:16,k:7,r:0}),pgT({type:'euclid',sound:'cow',len:16,k:5,r:6}),pgT({sound:'hat',pat:patOf('1211121112111211'),vol:0.6})]},
   {k:'empty',label:'Empty',sw:50,tracks:[pgT({sound:'kick'})]},
 ];
-const pg={tracks:[],sel:0,sw:50,view:'rings',rec:false,store:false,scenes:[null,null,null,null],scene:-1,P:null,flash:[]};
+const pg={tracks:[],sel:0,sw:50,view:'rings',rec:false,cur:0,store:false,scenes:[null,null,null,null],scene:-1,P:null,flash:[]};
 function pgFix(tr){
   const d=pgT({});Object.keys(d).forEach(k=>{if(tr[k]===undefined||tr[k]===null)tr[k]=Array.isArray(d[k])?d[k].slice():d[k];});if(!PG_TYPES.some(t=>t.k===tr.type))tr.type='steps';if(!PG_BASE[tr.sound])tr.sound='kick';
   if(tr.type==='groups'){tr.groups=(tr.groups||[]).map(g=>clamp(g|0,1,9));if(!tr.groups.length)tr.groups=[2];while(tr.groups.reduce((a,b)=>a+b,0)>32)tr.groups.pop();tr.len=tr.groups.reduce((a,b)=>a+b,0);}
@@ -1508,7 +1515,9 @@ function pgEvents(){
       o.push(Object.assign(pgVoiceEv(tr,clamp(base*h.v,0.02,1)),{t:((pos/Lc)%1+1)%1,layer:'P'+ti,tap:true}));});});
   return o;
 }
-function pgP(){const mu=pgMutedIdx();pg.P={Lc:pgLc(),true:pgLcTrue(),view:pg.view,sel:pg.sel,tracks:pg.tracks.map((t,i)=>({len:t.len,type:t.type,sound:t.sound,hits:pgHits(t),mute:mu[i],col:i}))};}
+const pgMaxLen=()=>Math.max(...pg.tracks.map(t=>t.len));
+const DIV_NAME=['','e','&','a'];
+function pgP(){const mu=pgMutedIdx();pg.cur=pg.cur%pgMaxLen();pg.P={rec:pg.rec,cur:pg.cur,maxLen:pgMaxLen(),Lc:pgLc(),true:pgLcTrue(),view:pg.view,sel:pg.sel,tracks:pg.tracks.map((t,i)=>({len:t.len,type:t.type,sound:t.sound,hits:pgHits(t),mute:mu[i],col:i}))};}
 /* figure geometry, shared by drawing and click-to-edit */
 function pgGeo(W,H,n,maxLen){maxLen=maxLen||32;const H2=H-74,cx=W/2+(W>700?60:0),cy=H2/2+6,Rmax=Math.max(60,Math.min(W*0.42,H2*0.45)),Rmin=Rmax*(n>3?0.3:0.42);
   return {H2,cx,cy,R:i=>n===1?Rmax*0.8:Rmax-i*(Rmax-Rmin)/(n-1),x0:Math.min(140,W*0.24),cw:(W-Math.min(140,W*0.24)-20)/maxLen,rowH:Math.min(64,(H2-70)/Math.max(1,n)),top:62};}
@@ -1523,8 +1532,10 @@ function sPg(x,W,H,I,P){
       t.hits.forEach(h=>{const age=local==null?99:((local-h.pos)%t.len+t.len)%t.len,gl=age*stepSec<0.25?Math.exp(-age*stepSec*10):0,X=G.x0+h.pos*G.cw;
         x.fillStyle=col;const hh=G.rowH*0.62*(h.v<0.5?0.5:1)*(1+gl*0.25);x.fillRect(X+2,y-hh/2,Math.max(4,G.cw-4),hh);x.lineWidth=2;x.strokeStyle=PAL.ink;x.strokeRect(X+2,y-hh/2,Math.max(4,G.cw-4),hh);});
       if(local!=null){const X=G.x0+local*G.cw;ln(x,X,y-G.rowH*0.45,X,y+G.rowH*0.45,PAL.ink,3);}
-      if(i===P.sel)ln(x,G.x0-8,y-G.rowH*0.36,G.x0-8,y+G.rowH*0.36,PAL.ink,4);x.restore();});
-    const yb=G.top+n*18+n*G.rowH+18;tx(x,'EACH CELL = ONE 16TH · ROWS LOOP AT THEIR OWN LENGTH',G.x0,yb,{f:'700 10px "Space Mono"',c:PAL.ink2});
+      if(i===P.sel)ln(x,G.x0-8,y-G.rowH*0.36,G.x0-8,y+G.rowH*0.36,PAL.ink,4);
+      if(P.rec){const c=P.cur%t.len,X=G.x0+c*G.cw;x.save();x.globalAlpha=1;x.lineWidth=3;x.strokeStyle=PAL.yel;x.strokeRect(X-1,y-G.rowH*0.45,G.cw+2,G.rowH*0.9);x.restore();}
+      x.restore();});
+    const yb=G.top+n*18+n*G.rowH+18;if(P.rec)tx(x,`STEP ${P.cur+1} · BEAT ${Math.floor(P.cur/4)+1}${P.cur%4?' · '+DIV_NAME[P.cur%4].toUpperCase():''}`,W-16,G.top,{f:'900 20px Archivo',st:'condensed',al:'right',c:PAL.red});tx(x,'EACH CELL = ONE 16TH · ROWS LOOP AT THEIR OWN LENGTH',G.x0,yb,{f:'700 10px "Space Mono"',c:PAL.ink2});
   }else{
     P.tracks.forEach((t,i)=>{const r=G.R(i),col=PG_COL(i);x.save();if(t.mute)x.globalAlpha=0.22;
       dot(x,G.cx,G.cy,r,null,i===P.sel?PAL.ink:PAL.hair,i===P.sel?2.5:1.5);
@@ -1533,11 +1544,13 @@ function sPg(x,W,H,I,P){
       if(t.hits.length>=2){x.beginPath();t.hits.forEach((h,k)=>{const a=-Math.PI/2+TAU*h.pos/t.len,X=G.cx+Math.cos(a)*r,Y=G.cy+Math.sin(a)*r;k?x.lineTo(X,Y):x.moveTo(X,Y);});x.closePath();x.fillStyle=hexA(col.startsWith('#')?col:'#888888',0.1);x.fill();x.lineWidth=1.5;x.strokeStyle=hexA(col.startsWith('#')?col:'#888888',0.6);x.stroke();}
       t.hits.forEach(h=>{const a=-Math.PI/2+TAU*h.pos/t.len,X=G.cx+Math.cos(a)*r,Y=G.cy+Math.sin(a)*r,age=local==null?99:((local-h.pos)%t.len+t.len)%t.len,gl=age*stepSec<0.25?Math.exp(-age*stepSec*10):0;
         dot(x,X,Y,br*(h.v<0.5?0.6:1)*(1+gl*0.7),col,PAL.ink,2);if(gl>0.05){x.save();x.globalAlpha*=gl;dot(x,X,Y,br+6+(1-gl)*16,null,col,2.5);x.restore();}});
+      if(P.rec){const c=P.cur%t.len,a=-Math.PI/2+TAU*c/t.len,X=G.cx+Math.cos(a)*r,Y=G.cy+Math.sin(a)*r;x.save();x.globalAlpha=1;x.lineWidth=3;x.strokeStyle=PAL.yel;x.strokeRect(X-br-5,Y-br-5,2*br+10,2*br+10);x.restore();}
       if(local!=null){const a=-Math.PI/2+TAU*local/t.len,X=G.cx+Math.cos(a)*(r+br+8),Y=G.cy+Math.sin(a)*(r+br+8);x.save();x.translate(X,Y);x.rotate(a+Math.PI/2);x.beginPath();x.moveTo(-6,-8);x.lineTo(6,-8);x.lineTo(0,2);x.closePath();x.fillStyle=PAL.ink;x.fill();x.restore();}
       x.restore();});
     const g=gpos==null?null:Math.floor(gpos)+1;
-    tx(x,g==null?String(P.true>3072?'∞':P.true):String(g),G.cx,G.cy+2,{f:'900 30px Archivo',st:'condensed',al:'center',b:'middle'});
-    tx(x,g==null?'STEPS TO REALIGN':`OF ${P.true>3072?'MANY':P.Lc}`,G.cx,G.cy+24,{f:'700 9px "Space Mono"',al:'center',c:PAL.ink2});
+    if(P.rec){const c=P.cur;tx(x,`${c+1}`,G.cx,G.cy-4,{f:'900 34px Archivo',st:'condensed',al:'center',b:'middle',c:PAL.red});tx(x,`BEAT ${Math.floor(c/4)+1}${c%4?' · '+DIV_NAME[c%4].toUpperCase():''}`,G.cx,G.cy+22,{f:'700 10px "Space Mono"',al:'center',c:PAL.ink});}
+    else tx(x,g==null?String(P.true>3072?'∞':P.true):String(g),G.cx,G.cy+2,{f:'900 30px Archivo',st:'condensed',al:'center',b:'middle'});
+    if(!P.rec)tx(x,g==null?'STEPS TO REALIGN':`OF ${P.true>3072?'MANY':P.Lc}`,G.cx,G.cy+24,{f:'700 9px "Space Mono"',al:'center',c:PAL.ink2});
   }
   const bars=P.true/16;tx(x,P.true>3072?'THE LOOPS ALMOST NEVER LINE UP':`ALL TRACKS LINE UP EVERY ${P.true} STEPS${Number.isInteger(bars)?` · ${bars} BAR${bars>1?'S':''}`:` · ${fmt1(bars)} BARS`}`,W-16,G.H2-10,{f:'700 10px "Space Mono"',al:'right',c:PAL.ink2});
 }
@@ -1565,14 +1578,32 @@ function pgPad(i,ts){
   const tr=pg.tracks[i];if(!tr)return;ensureAudio();const g=PG_BASE[tr.sound]*tr.vol*1.15,ev=Object.assign(pgVoiceEv(tr,g),{layer:'P'+i});
   if(!MIDI.mute)voice(ev,AC.currentTime);if(midiLive()){const m=evToMidi(ev);if(m)noteOut(m,ts);if(ROOM.role==='guest')roomFlush();}
   pg.flash[i]=performance.now();
-  if(pg.rec&&S.playing){const ct=ctOf(ts);if(ct>=S.t0){const ph=(((ct-S.t0)%S.D)+S.D)%S.D/S.D,local=(ph*pgLc())%tr.len,idx=Math.round(local)%tr.len;
-    if(tr.type!=='steps')pgFreeze(tr);if(!tr.pat[idx]){tr.pat[idx]=1;pg.sel=i;pgUpdate(true,false);pgBuildInspector();}}}
 }
+/* step programming: a cursor walks through the beat divisions; pads set or clear that track on the cursor's step */
+function pgStepToggle(i){
+  const tr=pg.tracks[i];if(!tr)return;if(tr.type!=='steps'){pgFreeze(tr);toast(`Track ${i+1} is now a Steps track`);}
+  const idx=pg.cur%tr.len;tr.pat[idx]=tr.pat[idx]?0:1;pg.sel=i;pg.flash[i]=performance.now();
+  if(tr.pat[idx]){ensureAudio();const ev=Object.assign(pgVoiceEv(tr,PG_BASE[tr.sound]*tr.vol*1.15),{layer:'P'+i});if(!MIDI.mute)voice(ev,AC.currentTime);}
+  pgUpdate(true,false);pgBuildInspector();pgPadMarks();
+}
+function pgPreviewStep(){
+  ensureAudio();const t=AC.currentTime+0.01;
+  pg.tracks.forEach((tr,i)=>{if(pgMutedIdx()[i])return;const idx=pg.cur%tr.len;pgHits(tr).forEach(h=>{if(Math.round(h.pos)%tr.len===idx&&Math.abs(h.pos-Math.round(h.pos))<0.01){if(!MIDI.mute)voice(Object.assign(pgVoiceEv(tr,PG_BASE[tr.sound]*tr.vol*h.v),{layer:'P'+i}),t);}});});
+}
+function pgMove(d){const L=pgMaxLen();pg.cur=((pg.cur+d)%L+L)%L;pgP();pgPadMarks();pgPreviewStep();}
+function pgClearStep(){pg.tracks.forEach(tr=>{if(tr.type==='steps')tr.pat[pg.cur%tr.len]=0;});pgUpdate(true,false);pgBuildInspector();pgPadMarks();}
+function pgPadMarks(){const pads=$$('#pgPads .pad');pg.tracks.forEach((tr,i)=>{const idx=pg.cur%tr.len,on=pgHits(tr).some(h=>Math.abs(h.pos-idx)<0.01);if(pads[i])pads[i].classList.toggle('set',pg.rec&&on);});
+  const lab=$('#pgStepLab');if(lab)lab.innerHTML=`<b>${pg.cur+1}</b>${Math.floor(pg.cur/4)+1}${pg.cur%4?' '+DIV_NAME[pg.cur%4]:''}`;}
 function pgBuildPads(){
   const host=$('#pgPads');if(!host)return;host.innerHTML='';const mu=pgMutedIdx();
-  const rec=el('button','rec','<i></i>Rec');rec.type='button';rec.setAttribute('aria-pressed',pg.rec);rec.title='Record: hits on the pads snap to the nearest step while playing';rec.onclick=()=>{pg.rec=!pg.rec;rec.setAttribute('aria-pressed',pg.rec);if(pg.rec&&!S.playing)toast('REC is armed: press play, then hit the pads');pgBuildInspector();};host.appendChild(rec);
+  const rec=el('button','rec','<i></i>Rec');rec.type='button';rec.setAttribute('aria-pressed',pg.rec);rec.title='Step programming: walk through every beat division and choose what plays on it';
+  rec.onclick=()=>{pg.rec=!pg.rec;if(pg.rec){toast('Step programming: tap pads to place sounds on this step, move with ◀ ▶');pgPreviewStep();}pgP();pgBuildPads();pgBuildInspector();};host.appendChild(rec);
+  if(pg.rec){const nav=el('div','stepnav');const pv=el('button','sn','◀');pv.type='button';pv.setAttribute('aria-label','Previous step');pv.onclick=()=>pgMove(-1);
+    const lb=el('div','snl');lb.id='pgStepLab';const nx=el('button','sn','▶');nx.type='button';nx.setAttribute('aria-label','Next step');nx.onclick=()=>pgMove(1);
+    const cl=el('button','sn snx','✕');cl.type='button';cl.title='Clear this step on every Steps track';cl.onclick=pgClearStep;nav.append(pv,lb,nx,cl);host.appendChild(nav);}
   pg.tracks.forEach((tr,i)=>{const b=el('button','pad'+(mu[i]?' off':''),`${PG_SOUNDS.find(s=>s.k===tr.sound).label}<small>${i+1} · ${PG_KEYS[i]}</small>`);b.type='button';b.style.setProperty('--pc',PG_CSS(i));b.style.setProperty('--pt',PG_TXT_CSS(i));
-    b.addEventListener('pointerdown',e=>{e.preventDefault();pgPad(i,e.timeStamp);});host.appendChild(b);});
+    b.addEventListener('pointerdown',e=>{e.preventDefault();pg.rec?pgStepToggle(i):pgPad(i,e.timeStamp);});host.appendChild(b);});
+  pgPadMarks();
 }
 function pgSurprise(){
   const desc=[];
@@ -1619,7 +1650,7 @@ function pgBuildInspector(){
     if(pg.store||!pg.scenes[it.i]){pg.scenes[it.i]={tracks:pgClone(pg.tracks),sw:pg.sw};pg.scene=it.i;pg.store=false;toast(`Stored in scene ${'ABCD'[it.i]}`);pgBuildInspector();return;}
     pg.tracks=pgClone(pg.scenes[it.i].tracks).map(pgFix);pg.sw=pg.scenes[it.i].sw;pg.scene=it.i;pg.sel=Math.min(pg.sel,pg.tracks.length-1);pgUpdate(true,true);});
   seg(sc,[{label:'Store'}],()=>pg.store,()=>{pg.store=!pg.store;if(pg.store)toast('Now click a scene letter to store this groove in it');});
-  d.appendChild(el('p','mp-fine','Empty scenes (·) store the current groove on first click. Pads: keys A S D F G H. REC snaps pad hits to the nearest step.'));
+  d.appendChild(el('p','mp-fine','Empty scenes (·) store the current groove on first click. Pads: keys A S D F G H. REC programs the beat step by step: pads place sounds on the cursor, ◀ ▶ (or arrow keys) move it.'));
 }
 function pgLoadTemplate(t){pg.tracks=pgClone(t.tracks).map(pgFix);pg.sw=t.sw;pg.sel=0;pg.scene=-1;}
 pgLoadTemplate(PG_TEMPLATES[1]);pgP();
@@ -1627,7 +1658,7 @@ pgLoadTemplate(PG_TEMPLATES[1]);pgP();
 pgBuildInspector();pgBuildPads();
 makeStage('pg',$('#stage-pg'),sPg,()=>pg.P);
 stages.pg.cv.addEventListener('pointerdown',e=>{const r=stages.pg.cv.getBoundingClientRect(),h=pgHitTest(e.clientX-r.left,e.clientY-r.top,r.width,r.height);if(!h)return;
-  if(h.idx==null){pg.sel=h.i;pgP();pgBuildInspector();return;}pgToggle(h.i,h.idx);});
+  if(h.idx==null){pg.sel=h.i;pgP();pgBuildInspector();return;}if(pg.rec){pg.cur=h.idx;pg.sel=h.i;pgStepToggle(h.i);return;}pgToggle(h.i,h.idx);});
 
 /* ====================================================================
    07 · RHYTHM ARCADE
@@ -2539,7 +2570,8 @@ document.addEventListener('keydown',e=>{
   if(k==='n'||(k==='enter'&&cur==='qz'&&(arc.done||arc.screen!=='q'))){if(cur==='qz'&&arc.screen==='q'&&!arc.done)return;e.preventDefault();if(arc.screen==='q'&&arc.done)arcNext();else arcStart(arc.screen==='result'?arc.len:10);return;}
   if(k==='t'){tapTempo();return;}
   if(k==='m'){setMetro(!clickOn());toast(clickOn()?'Click on':'Click off');return;}
-  if(cur==='pg'&&!e.metaKey){const pi='asdfgh'.indexOf(k);if(pi>=0&&pg.tracks[pi]){e.preventDefault();pgPad(pi,e.timeStamp);return;}}
+  if(cur==='pg'&&!e.metaKey){const pi='asdfgh'.indexOf(k);if(pi>=0&&pg.tracks[pi]){e.preventDefault();pg.rec?pgStepToggle(pi):pgPad(pi,e.timeStamp);return;}
+    if(pg.rec&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();pgMove(e.key==='ArrowRight'?1:-1);return;}if(pg.rec&&(e.key==='Backspace'||e.key==='Delete')){e.preventDefault();pgClearStep();return;}}
   if(/^[1-8]$/.test(e.key)){show(MODS[+e.key-1].id);return;}
 });
 
